@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, input, output, ty
 import { AgGridAngular } from "ag-grid-angular";
 import {
 	type ColDef,
-	colorSchemeVariable,
+	colorSchemeLightCold,
 	type GridOptions,
 	type RowClickedEvent,
 	type RowSelectionOptions,
@@ -27,7 +27,7 @@ export class TabContentTable<T extends object> {
 
 	readonly rowClicked = output<T>();
 
-	protected readonly themeAlpine = themeAlpine.withPart(colorSchemeVariable);
+	protected readonly themeAlpine = themeAlpine.withPart(colorSchemeLightCold);
 
 	protected readonly columnDefs: Signal<ColDef<T>[]> = computed(() => {
 		const providedColumnDefs = this.columnDefsInput();
@@ -48,7 +48,7 @@ export class TabContentTable<T extends object> {
 				filter: true,
 				sortable: true,
 				editable: false,
-				flex: 1,
+				minWidth: 100,
 			}),
 		);
 	});
@@ -63,8 +63,8 @@ export class TabContentTable<T extends object> {
 		theme: this.themeAlpine,
 		suppressCellFocus: true,
 		pagination: true,
-		paginationPageSize: 10,
-		paginationPageSizeSelector: [10, 15, 20, 50],
+		paginationPageSize: 50,
+		paginationPageSizeSelector: [50, 100, 250, 1000],
 		autoSizeStrategy: { type: "fitCellContents" },
 	};
 

@@ -1,0 +1,35 @@
+@if (tabs().length > 0) {
+<mat-tab-group class="h-full min-h-0" dynamicHeight="false" mat-stretch-tabs="false" animationDuration="120ms"
+    [selectedIndex]="selectedIndex()" (selectedIndexChange)="selectTab($event)">
+
+    @for (tab of tabs(); track tab.id) {
+    <mat-tab>
+        <ng-template mat-tab-label>
+            @if (tab.menuItem.icon) {
+            <fa-icon class="text-base" [class]="tab.menuItem.iconColor || 'text-yellow-500'" [icon]="tab.menuItem.icon">
+            </fa-icon>
+            }
+
+            <span class="ml-2 max-w-48 truncate select-none">
+                {{ tab.menuItem.text }}
+            </span>
+
+            @if (tab.closable !== false) {
+            <button type="button" mat-icon-button class="ml-1 scale-75" aria-label="Close tab"
+                (click)="closeTab($event, tab.id)">
+                <mat-icon>close</mat-icon>
+            </button>
+            }
+        </ng-template>
+
+        <div class="h-full min-h-0 overflow-auto p-4">
+            <app-tab-content-table [rowData]="tableData"></app-tab-content-table>
+        </div>
+    </mat-tab>
+    }
+</mat-tab-group>
+} @else {
+<div class="h-full grid place-items-center p-6 text-sm text-slate-500">
+    No screen is open.
+</div>
+}

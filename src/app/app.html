@@ -9,16 +9,27 @@
     [class.pointer-events-none]="!isMenuOpen()" (click)="onBackdropClick()">
   </div>
 
-  <header class="h-14 shrink-0 bg-white border-b border-slate-200
-                 flex items-center justify-between px-3">
+  <header class="h-12 shrink-0 bg-slate-200 border-b border-slate-200
+                 flex items-center justify-between px-2">
     <div class="flex items-center gap-2">
-      <button type="button" class="size-9 bg-slate-200 grid place-items-center rounded-lg ring-1 ring-slate-300
+      <button type="button" class="size-8 bg-slate-200 grid place-items-center rounded-lg ring-1 ring-slate-300
                      hover:bg-slate-400 active:scale-95 transition" aria-label="Open menu"
         [attr.aria-expanded]="isMenuOpen()" aria-controls="app-sidebar" (click)="toggleMenu(true)">
-        <fa-icon [icon]="bars"></fa-icon>
+        <fa-icon [icon]="'bars'"></fa-icon>
       </button>
 
     </div>
 
   </header>
+
+
+  <!-- Workspace territory under header -->
+  <main class="flex-1 min-h-0 p-1">
+    <section
+      class="h-full min-h-80 overflow-auto rounded-l bg-white border border-slate-200 shadow-sm">
+      <!-- Later: your tab container goes here -->
+      <!-- <app-tab-container class="block h-full min-h-0"></app-tab-container> -->
+    </section>
+  </main>
+
 </div>

@@ -1,9 +1,9 @@
-import { Component, computed, signal } from "@angular/core";
+import { Component, inject, signal } from "@angular/core";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
-import { faBars } from "@fortawesome/free-solid-svg-icons";
 import { Menu } from "./menu/menu";
 import type { MenuItemModel } from "./menu/menuItem.model";
 import { menuData } from "./mock-data/menuData";
+import { FaIconRegistry } from "./services/fa-icon-registry";
 
 @Component({
 	selector: "app-root",
@@ -13,10 +13,10 @@ import { menuData } from "./mock-data/menuData";
 export class App {
 	protected readonly title = signal("menu-component");
 	readonly isMenuOpen = signal(true);
+	faIconRegistry = inject(FaIconRegistry);
 
-	selectedMneuItem = signal<MenuItemModel | null>(null);
+	selectedMenuItem = signal<MenuItemModel | null>(null);
 	menuData = signal(menuData);
-	bars = faBars;
 
 	onBackdropClick() {
 		if (this.isMenuOpen()) {
@@ -29,7 +29,7 @@ export class App {
 	}
 
 	async menuItemClicked(item: MenuItemModel) {
-		this.selectedMneuItem.set(item);
+		this.selectedMenuItem.set(item);
 		this.toggleMenu(false);
 	}
 }

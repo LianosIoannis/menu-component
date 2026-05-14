@@ -1,6 +1,6 @@
 import { Component, computed, effect, inject, input, output, signal } from "@angular/core";
-import { FaIconLibrary, FontAwesomeModule } from "@fortawesome/angular-fontawesome";
-import { fas } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
+import { FaIconRegistry } from "../../services/fa-icon-registry";
 import type { MenuItemModel } from "../menuItem.model";
 
 @Component({
@@ -13,18 +13,14 @@ export class MenuItem {
 	filtered = input.required<boolean>();
 	onItemClicked = output<MenuItemModel>();
 
-	iconLibrary = inject(FaIconLibrary);
+	faIconRegistry = inject(FaIconRegistry);
 
 	menuClosed = signal<boolean>(false);
+	menuClosedEffect = effect(() => {
+		this.menuClosed.set(!this.filtered());
+	});
+
 	faIcon = computed(() => this.menuItem().icon || "cog");
-
-	constructor() {
-		this.iconLibrary.addIconPacks(fas);
-
-		effect(() => {
-			this.menuClosed.set(!this.filtered());
-		});
-	}
 
 	itemClicked() {
 		if (this.menuItem().isFolder) {

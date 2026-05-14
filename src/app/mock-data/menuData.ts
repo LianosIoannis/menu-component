@@ -1,4 +1,4 @@
-import type { MenuDataModel } from "./menu/menuItem.model";
+import type { MenuDataModel } from "../menu/menuItem.model";
 
 export const menuData: MenuDataModel = {
 	mainHeaderText: "Manufacturing",

@@ -1,4 +1,3 @@
-import { NgClass } from "@angular/common";
 import { Component, computed, effect, inject, input, output, signal } from "@angular/core";
 import { FaIconLibrary, FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { fas } from "@fortawesome/free-solid-svg-icons";
@@ -6,7 +5,7 @@ import type { MenuItemModel } from "../menuItem.model";
 
 @Component({
 	selector: "app-menu-item",
-	imports: [FontAwesomeModule, NgClass],
+	imports: [FontAwesomeModule],
 	templateUrl: "./menu-item.html",
 })
 export class MenuItem {

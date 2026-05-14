@@ -3,7 +3,7 @@ import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { faBars } from "@fortawesome/free-solid-svg-icons";
 import { Menu } from "./menu/menu";
 import type { MenuItemModel } from "./menu/menuItem.model";
-import { menuData } from "./menuData";
+import { menuData } from "./mock-data/menuData";
 
 @Component({
 	selector: "app-root",

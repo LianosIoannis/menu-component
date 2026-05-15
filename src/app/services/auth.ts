@@ -15,6 +15,7 @@ export class Auth {
 
 	token = signal<string | null>(sessionStorage.getItem(this.TOKEN_KEY));
 	userData = signal<Record<string, string> | null>(null);
+	loading = signal(false);
 
 	private setToken(token: string | null) {
 		if (token) {
@@ -27,11 +28,13 @@ export class Auth {
 	}
 
 	async login(payload: LoginPayload) {
+		this.loading.set(true);
+
 		const res = await fetch(`${this.baseUrl}/login/user/${payload.username}`, {
 			method: "POST",
 			headers: { "Content-Type": "application/json", appcode: this.appCode, password: payload.password },
 		});
-
+		
 		const data = await res.json();
 
 		if (!res.ok) {
@@ -39,14 +42,18 @@ export class Auth {
 		}
 
 		this.userData.set(data);
-		// biome-ignore lint/complexity/useLiteralKeys: <explanation>
+		// biome-ignore lint/complexity/useLiteralKeys: <token>
 		this.setToken(this.userData()?.["token"] ?? null);
+
+		this.loading.set(false);
+
 		return data;
 	}
 
 	logout() {
 		this.setToken(null);
 		this.userData.set(null);
+		this.loading.set(false);
 	}
 
 	isLoggedIn() {

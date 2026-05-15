@@ -74,5 +74,5 @@ export class TabContentTable<T extends object> {
 		}
 
 		this.rowClicked.emit(event.data);
-	}
+	};
 }

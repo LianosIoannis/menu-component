@@ -3,12 +3,42 @@ export type MenuItemModel = {
 	text: string;
 	icon: string;
 	iconColor: string;
+	params?: MenuItemParams;
 	isFolder: boolean;
 	items: MenuItemModel[];
 };
 
 export type MenuDataModel = {
-  mainHeaderText: string;
-  subHeaderText: string;
-  menuItems: MenuItemModel[];
-}
+	mainHeaderText: string;
+	subHeaderText: string;
+	menuItems: MenuItemModel[];
+};
+
+export type TableColumnType = "string" | "number" | "boolean" | "date" | "datetime" | "time";
+
+export type TableColumnParams = {
+	name: string;
+	label?: string;
+	type: TableColumnType;
+
+	retrieve?: boolean;
+	insert?: boolean;
+	update?: boolean;
+
+	primaryKey?: boolean;
+	visible?: boolean;
+	sortable?: boolean;
+	filterable?: boolean;
+	editable?: boolean;
+};
+
+export type MenuItemParams = {
+	screenType: "table";
+	table?: TableScreenParams;
+};
+
+export type TableScreenParams = {
+	name: string;
+	title?: string;
+	columns: TableColumnParams[];
+};

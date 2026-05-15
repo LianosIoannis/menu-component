@@ -3,7 +3,8 @@
   <app-menu class="fixed top-0 left-0 h-full w-90 z-20 bg-white shadow-xl ring-1 ring-black/5
            transform transition-transform duration-300 ease-in-out" [menuData]="menuData()"
     (onCloseClicked)="toggleMenu(false)" [class.-translate-x-full]="!isMenuOpen()"
-    (onItemClicked)="menuItemClicked($event)" (onLogoutClicked)="this.auth.logout()" (onProfileClicked)="onProfileClicked()"></app-menu>
+    (onItemClicked)="menuItemClicked($event)" (onLogoutClicked)="this.auth.logout()"
+    (onProfileClicked)="onProfileClicked()"></app-menu>
 
   <!-- Backdrop -->
   <div class="fixed inset-0 z-10 bg-slate-900/40 transition-opacity duration-300" [class.opacity-0]="!isMenuOpen()"
@@ -24,15 +25,15 @@
 
     </div>
 
-    <!-- <div class="flex items-center gap-2">
+    <div class="flex items-center gap-2">
 
       <button type="button" class="size-9 bg-slate-200 grid place-items-center rounded-lg ring-1 ring-slate-300
                      hover:bg-slate-400 active:scale-95 transition" aria-label="Open menu"
-        [attr.aria-expanded]="isMenuOpen()" aria-controls="app-sidebar" (click)="toggleMenu(true)">
+        [attr.aria-expanded]="isMenuOpen()" aria-controls="app-sidebar" (click)="testQuery()">
         <fa-icon [icon]="'arrow-right-to-bracket'" size="lg"></fa-icon>
       </button>
 
-    </div> -->
+    </div>
 
 
   </header>
@@ -53,3 +54,7 @@
 } @else {
 <app-signin></app-signin>
 }
+
+<ngx-spinner bdColor="rgba(2, 6, 23, 0.72)" color="#e2e8f0" size="medium" type="ball-spin-fade" [fullScreen]="true">
+	<p class="text-sm font-medium tracking-[0.2em] text-slate-100 uppercase">Loading</p>
+</ngx-spinner>

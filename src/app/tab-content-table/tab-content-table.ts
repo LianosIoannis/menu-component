@@ -18,16 +18,13 @@ import { AgGridRegistry } from "../services/ag-grid-registry";
 })
 export class TabContentTable<T extends object> {
 	protected readonly agGridRegistry = inject(AgGridRegistry);
+	protected readonly themeAlpine = themeAlpine.withPart(colorSchemeLightCold);
 
 	readonly rowData = input<T[]>([]);
-
-	readonly title = input<string>("");
 
 	readonly columnDefsInput = input<ColDef<T>[] | null>(null);
 
 	readonly rowClicked = output<T>();
-
-	protected readonly themeAlpine = themeAlpine.withPart(colorSchemeLightCold);
 
 	protected readonly columnDefs: Signal<ColDef<T>[]> = computed(() => {
 		const providedColumnDefs = this.columnDefsInput();
@@ -74,5 +71,5 @@ export class TabContentTable<T extends object> {
 		}
 
 		this.rowClicked.emit(event.data);
-	};
+	}
 }

@@ -4,18 +4,23 @@ import { nanoid } from "nanoid";
 import { Menu } from "./menu/menu";
 import type { MenuItemModel } from "./menu/menuItem.model";
 import { menuData } from "./mock-data/menuData";
+import { Auth } from "./services/auth";
 import { FaIconRegistry } from "./services/fa-icon-registry";
+import { Signin } from "./signin/signin";
 import type { TabModel } from "./tab-container/tab.model";
 import { TabContainer } from "./tab-container/tab-container";
 
 @Component({
 	selector: "app-root",
 	templateUrl: "./app.html",
-	imports: [Menu, FontAwesomeModule, TabContainer],
+	imports: [Menu, FontAwesomeModule, TabContainer, Signin],
 })
 export class App {
 	protected readonly title = signal("menu-component");
 	readonly isMenuOpen = signal(true);
+
+	auth = inject(Auth);
+
 	faIconRegistry = inject(FaIconRegistry);
 
 	selectedMenuItem = signal<MenuItemModel | null>(null);
@@ -67,5 +72,10 @@ export class App {
 		]);
 
 		this.activeTabId.set(tabId);
+	}
+
+	onProfileClicked() {
+		const userData = this.auth.userData();
+		alert(`User data: ${JSON.stringify(userData, null, 2)}`);
 	}
 }

@@ -1,8 +1,9 @@
+@if (this.auth.isLoggedIn()) {
 <div class="w-screen h-screen bg-slate-100 flex flex-col items-stretch">
   <app-menu class="fixed top-0 left-0 h-full w-90 z-20 bg-white shadow-xl ring-1 ring-black/5
            transform transition-transform duration-300 ease-in-out" [menuData]="menuData()"
     (onCloseClicked)="toggleMenu(false)" [class.-translate-x-full]="!isMenuOpen()"
-    (onItemClicked)="menuItemClicked($event)"></app-menu>
+    (onItemClicked)="menuItemClicked($event)" (onLogoutClicked)="this.auth.logout()" (onProfileClicked)="onProfileClicked()"></app-menu>
 
   <!-- Backdrop -->
   <div class="fixed inset-0 z-10 bg-slate-900/40 transition-opacity duration-300" [class.opacity-0]="!isMenuOpen()"
@@ -11,7 +12,10 @@
 
   <header class="h-13 shrink-0 bg-slate-200 border-b border-slate-200
                  flex items-center justify-between px-2">
+
+
     <div class="flex items-center gap-2">
+
       <button type="button" class="size-9 bg-slate-200 grid place-items-center rounded-lg ring-1 ring-slate-300
                      hover:bg-slate-400 active:scale-95 transition" aria-label="Open menu"
         [attr.aria-expanded]="isMenuOpen()" aria-controls="app-sidebar" (click)="toggleMenu(true)">
@@ -19,6 +23,17 @@
       </button>
 
     </div>
+
+    <!-- <div class="flex items-center gap-2">
+
+      <button type="button" class="size-9 bg-slate-200 grid place-items-center rounded-lg ring-1 ring-slate-300
+                     hover:bg-slate-400 active:scale-95 transition" aria-label="Open menu"
+        [attr.aria-expanded]="isMenuOpen()" aria-controls="app-sidebar" (click)="toggleMenu(true)">
+        <fa-icon [icon]="'arrow-right-to-bracket'" size="lg"></fa-icon>
+      </button>
+
+    </div> -->
+
 
   </header>
 
@@ -30,8 +45,11 @@
       <app-tab-container class="block h-full min-h-0" [tabs]="tabs()" [activeTabId]="activeTabId()"
         (tabSelected)="selectTab($event)" (tabClosed)="closeTab($event)">
       </app-tab-container>
-      
+
     </section>
   </main>
 
 </div>
+} @else {
+<app-signin></app-signin>
+}

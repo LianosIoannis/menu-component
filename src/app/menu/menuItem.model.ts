@@ -15,6 +15,7 @@ export type MenuDataModel = {
 };
 
 export type TableColumnType = "string" | "number" | "boolean" | "date" | "datetime" | "time";
+export type TableScreenType = "table" | "custom";
 
 export type TableColumnParams = {
 	name: string;
@@ -22,9 +23,15 @@ export type TableColumnParams = {
 	type: TableColumnType;
 
 	retrieve?: boolean;
+
   retrieveCriteria?: boolean;
+  retrieveCriteriaRequired?: boolean;
+
 	insert?: boolean;
+  insertRequired?: boolean;
+
 	update?: boolean;
+  updateRequired?: boolean;
 
 	primaryKey?: boolean;
 	visible?: boolean;
@@ -34,12 +41,11 @@ export type TableColumnParams = {
 };
 
 export type MenuItemParams = {
-	screenType: "table";
+	screenType: TableScreenType;
 	table?: TableScreenParams;
 };
 
 export type TableScreenParams = {
 	name: string;
-	title?: string;
 	columns: TableColumnParams[];
 };

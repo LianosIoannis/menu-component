@@ -3,11 +3,11 @@
 @import "tailwindcss";
 
 app-tab-container {
-	--mdc-tab-height: 36px;
+	--mdc-tab-height: 42px;
 }
 
 app-tab-container .mat-mdc-tab {
-	height: 36px;
+	height: 42px;
 	padding-inline: 10px;
 }
 

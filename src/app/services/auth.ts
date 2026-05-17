@@ -10,7 +10,7 @@ export type LoginPayload = {
 })
 export class Auth {
 	// private readonly baseUrl = "http://localhost:5000";
-  private readonly baseUrl = "http://10.0.0.5:5000";
+	private readonly baseUrl = "http://10.0.0.5:5000";
 	private readonly TOKEN_KEY = "login_token";
 	private readonly appCode = "futuresoft";
 
@@ -31,24 +31,26 @@ export class Auth {
 	async login(payload: LoginPayload) {
 		this.loading.set(true);
 
-		const res = await fetch(`${this.baseUrl}/login/user/${payload.username}`, {
-			method: "POST",
-			headers: { "Content-Type": "application/json", appcode: this.appCode, password: payload.password },
-		});
+		try {
+			const res = await fetch(`${this.baseUrl}/login/user/${payload.username}`, {
+				method: "POST",
+				headers: { "Content-Type": "application/json", appcode: this.appCode, password: payload.password },
+			});
 
-		const data = await res.json();
+			const data = await res.json();
 
-		if (!res.ok) {
-			throw new Error(data?.message || "Login failed");
+			if (!res.ok) {
+				throw new Error(data?.message || "Login failed");
+			}
+
+			this.userData.set(data);
+			// biome-ignore lint/complexity/useLiteralKeys: <token>
+			this.setToken(this.userData()?.["token"] ?? null);
+
+			return data;
+		} finally {
+			this.loading.set(false);
 		}
-
-		this.userData.set(data);
-		// biome-ignore lint/complexity/useLiteralKeys: <token>
-		this.setToken(this.userData()?.["token"] ?? null);
-
-		this.loading.set(false);
-
-		return data;
 	}
 
 	logout() {

@@ -11,7 +11,6 @@ export function createColumnDefs<T extends object>(columns: readonly TableColumn
 				headerName: column.label ?? column.name,
 				sortable: column.sortable ?? true,
 				filter: column.filterable ?? true,
-				editable: column.editable ?? false,
 				flex: 1,
 				valueFormatter: createValueFormatter(column),
 			}),

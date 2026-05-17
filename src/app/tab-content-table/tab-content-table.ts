@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, output, type Signal } from "@angular/core";
+import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { AgGridAngular } from "ag-grid-angular";
 import {
 	type ColDef,
@@ -9,15 +10,17 @@ import {
 	themeAlpine,
 } from "ag-grid-community";
 import { AgGridRegistry } from "../services/ag-grid-registry";
+import { FaIconRegistry } from "../services/fa-icon-registry";
 
 @Component({
 	selector: "app-tab-content-table",
-	imports: [AgGridAngular],
+	imports: [AgGridAngular, FontAwesomeModule],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: "./tab-content-table.html",
 })
 export class TabContentTable<T extends object> {
 	protected readonly agGridRegistry = inject(AgGridRegistry);
+	protected readonly faIconRegistry = inject(FaIconRegistry);
 	protected readonly themeAlpine = themeAlpine.withPart(colorSchemeLightCold);
 
 	readonly rowData = input<T[]>([]);

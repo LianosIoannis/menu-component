@@ -1,18 +1,43 @@
 <section class="h-full min-h-0 flex flex-col bg-white">
-    <header class="shrink-0 border-b border-slate-200">
-        <div class="flex items-center justify-between gap-3">
+  <header class="shrink-0 border-b border-slate-200">
+    <div class="h-12 flex items-center justify-end gap-3 p-3">
 
-            <div class="flex items-center gap-2">
-                <ng-content select="[table-actions]" />
-            </div>
-        </div>
+      <button type="button"
+        class="inline-flex size-9 items-center justify-center rounded border border-emerald-200 bg-emerald-50 text-emerald-700 transition hover:bg-emerald-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2"
+        aria-label="Add new row" title="New row">
+        <fa-icon [icon]="'plus'" [fixedWidth]="true"></fa-icon>
+      </button>
 
-        <ng-content select="[table-header]" />
-    </header>
+      <button type="button"
+        class="inline-flex size-9 items-center justify-center rounded border border-red-200 bg-red-50 text-red-700 transition hover:bg-red-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-600 focus-visible:ring-offset-2"
+        aria-label="Remove selected row" title="Remove">
+        <fa-icon [icon]="'trash'" [fixedWidth]="true"></fa-icon>
+      </button>
 
-    <div class="flex-1 min-h-0">
-        <ag-grid-angular class="h-full" [rowData]="rowData()" [columnDefs]="columnDefs()"
-            [rowSelection]="rowSelection" [gridOptions]="gridOptions" (rowClicked)="onRowClicked($event)">
-        </ag-grid-angular>
+      <button type="button"
+        class="inline-flex size-9 items-center justify-center rounded border border-amber-200 bg-amber-50 text-amber-700 transition hover:bg-amber-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-600 focus-visible:ring-offset-2"
+        aria-label="Edit selected row" title="Edit">
+        <fa-icon [icon]="'edit'" [fixedWidth]="true"></fa-icon>
+      </button>
+
+      <button type="button"
+        class="inline-flex size-9 items-center justify-center rounded border border-sky-200 bg-sky-50 text-sky-700 transition hover:bg-sky-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-600 focus-visible:ring-offset-2"
+        aria-label="Filter rows" title="Filter">
+        <fa-icon [icon]="'filter'" [fixedWidth]="true"></fa-icon>
+      </button>
+
+      <button type="button"
+        class="inline-flex size-9 items-center justify-center rounded border border-violet-200 bg-violet-50 text-violet-700 transition hover:bg-violet-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-2"
+        aria-label="Refresh rows" title="Refresh">
+        <fa-icon [icon]="'sync-alt'" [fixedWidth]="true"></fa-icon>
+      </button>
+
     </div>
+  </header>
+
+  <div class="flex-1 min-h-0">
+    <ag-grid-angular class="h-full" [rowData]="rowData()" [columnDefs]="columnDefs()" [rowSelection]="rowSelection"
+      [gridOptions]="gridOptions" (rowClicked)="onRowClicked($event)">
+    </ag-grid-angular>
+  </div>
 </section>

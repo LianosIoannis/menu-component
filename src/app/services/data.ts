@@ -11,7 +11,8 @@ export type QueryResult = {
 	providedIn: "root",
 })
 export class Data {
-	private readonly baseUrl = "http://localhost:5000/fs_timer_mob";
+	// private readonly baseUrl = "http://localhost:5000/fs_timer_mob";
+  private readonly baseUrl = "http://10.0.0.5:5000/fs_timer_mob";
 	auth = inject(Auth);
 	loading  = signal(false);
 
@@ -27,7 +28,7 @@ export class Data {
 		});
 
 		const data = await res.json();
-    
+
 		if (res.status === 532) {
       alert("Session expired. Please log in again.");
 			this.auth.logout();

@@ -22,6 +22,7 @@ export type TableColumnParams = {
 	type: TableColumnType;
 
 	retrieve?: boolean;
+  retrieveCriteria?: boolean;
 	insert?: boolean;
 	update?: boolean;
 

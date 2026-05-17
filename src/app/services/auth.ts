@@ -9,7 +9,8 @@ export type LoginPayload = {
 	providedIn: "root",
 })
 export class Auth {
-	private readonly baseUrl = "http://localhost:5000";
+	// private readonly baseUrl = "http://localhost:5000";
+  private readonly baseUrl = "http://10.0.0.5:5000";
 	private readonly TOKEN_KEY = "login_token";
 	private readonly appCode = "futuresoft";
 
@@ -34,7 +35,7 @@ export class Auth {
 			method: "POST",
 			headers: { "Content-Type": "application/json", appcode: this.appCode, password: payload.password },
 		});
-		
+
 		const data = await res.json();
 
 		if (!res.ok) {

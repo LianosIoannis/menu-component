@@ -1,0 +1,66 @@
+@if (open()) {
+<div class="absolute inset-0 z-20 flex bg-slate-950/30" [class.justify-end]="isRtl()" [class.justify-start]="!isRtl()">
+  <aside class="h-full w-full max-w-md overflow-auto bg-white shadow-xl" [class.border-l]="isRtl()"
+    [class.border-r]="!isRtl()" [class.border-slate-200]="true" [attr.dir]="orientation()"
+    aria-labelledby="tab-content-drawer-title">
+    <form [formRoot]="drawerForm" class="flex min-h-full flex-col" (submit)="submit()">
+      <header class="flex h-14 shrink-0 items-center justify-between border-b border-slate-200 px-4">
+        <h2 id="tab-content-drawer-title" class="text-base font-semibold text-slate-900">
+          {{ drawerTitle() }}
+        </h2>
+
+        <button type="button"
+          class="inline-flex size-9 items-center justify-center rounded border border-slate-300 text-slate-700 transition hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2"
+          aria-label="Close drawer" title="Close" (click)="close()">
+          X
+        </button>
+      </header>
+
+      <div class="flex-1 space-y-4 p-4">
+        @for (column of columns(); track column.name) {
+        <div>
+          <label [for]="'drawer-field-' + column.name" class="block text-sm font-medium text-slate-700">
+            {{ column.label }}
+            @if (column.required) {
+            <span class="text-red-600">*</span>
+            }
+          </label>
+
+          <div class="mt-1">
+            @if (column.type === "boolean") {
+            <input [id]="'drawer-field-' + column.name" [type]="inputType(column)"
+              [formField]="$any(drawerForm)[column.name]"
+              class="size-4 rounded border-slate-300 text-blue-600 focus:ring-blue-600" />
+            } @else {
+            <input [id]="'drawer-field-' + column.name" [type]="inputType(column)" [formField]="$any(drawerForm)[column.name]"
+              class="block w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 read-only:bg-slate-100 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20" />
+            }
+          </div>
+
+          @if ($any(drawerForm)[column.name]().touched() && $any(drawerForm)[column.name]().invalid()) {
+          <div class="mt-2 text-sm text-red-600">
+            @for (error of $any(drawerForm)[column.name]().errors(); track error) {
+            <p>{{ error.message }}</p>
+            }
+          </div>
+          }
+        </div>
+        }
+      </div>
+
+      <footer class="flex shrink-0 justify-end gap-2 border-t border-slate-200 p-4">
+        <button type="button"
+          class="rounded border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2"
+          (click)="close()">
+          Cancel
+        </button>
+
+        <button type="submit"
+          class="rounded bg-blue-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2">
+          Apply
+        </button>
+      </footer>
+    </form>
+  </aside>
+</div>
+}

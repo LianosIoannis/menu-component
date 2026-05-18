@@ -3,7 +3,6 @@ import { MatButtonModule } from "@angular/material/button";
 import { MatIconModule } from "@angular/material/icon";
 import { MatTabsModule } from "@angular/material/tabs";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
-import { tableData } from "../mock-data/tableData";
 import { FaIconRegistry } from "../services/fa-icon-registry";
 import { TabContentTable } from "../tab-content-table/tab-content-table";
 import type { TabModel } from "./tab.model";
@@ -16,7 +15,6 @@ import type { TabModel } from "./tab.model";
 })
 export class TabContainer {
 	faIconRegistry = inject(FaIconRegistry);
-	tableData = tableData;
 	readonly tabs = input.required<readonly TabModel[]>();
 	readonly activeTabId = input<string | null>(null);
 

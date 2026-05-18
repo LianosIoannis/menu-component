@@ -20,7 +20,7 @@
         <fa-icon [icon]="'edit'" [fixedWidth]="true"></fa-icon>
       </button>
 
-      <button type="button"
+      <button type="button" (click)="editClicked()"
         class="inline-flex size-9 items-center justify-center rounded border border-sky-200 bg-sky-50 text-sky-700 transition hover:bg-sky-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-600 focus-visible:ring-offset-2"
         aria-label="Filter rows" title="Filter">
         <fa-icon [icon]="'filter'" [fixedWidth]="true"></fa-icon>
@@ -41,3 +41,5 @@
     </ag-grid-angular>
   </div>
 </section>
+
+<app-tab-content-drawer [open]="drawerOpen()" (closed)="closeDrawer()"></app-tab-content-drawer>

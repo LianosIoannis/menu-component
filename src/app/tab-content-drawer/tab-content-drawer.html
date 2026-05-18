@@ -1,25 +1,30 @@
-@if (open()) {
-<div class="absolute inset-0 z-20 flex bg-slate-950/30" [class.justify-end]="isRtl()" [class.justify-start]="!isRtl()">
-  <aside class="h-full w-full max-w-md overflow-auto bg-white shadow-xl" [class.border-l]="isRtl()"
-    [class.border-r]="!isRtl()" [class.border-slate-200]="true" [attr.dir]="orientation()"
+<div class="absolute inset-0 z-20 flex bg-slate-950/30 transition-opacity duration-300 ease-in-out"
+  [class.justify-end]="isRtl()" [class.justify-start]="!isRtl()" [class.opacity-100]="open()"
+  [class.opacity-0]="!open()" [class.pointer-events-none]="!open()">
+  <aside class="h-full w-full max-w-md transform overflow-auto bg-slate-50 shadow-2xl transition-transform duration-300 ease-in-out"
+    [class.translate-x-0]="open()" [class.translate-x-full]="isRtl() && !open()"
+    [class.-translate-x-full]="!isRtl() && !open()" [class.border-l]="isRtl()" [class.border-r]="!isRtl()"
+    [class.border-slate-200]="true" [attr.dir]="orientation()"
     aria-labelledby="tab-content-drawer-title">
     <form [formRoot]="drawerForm" class="flex min-h-full flex-col" (submit)="submit()">
-      <header class="flex h-14 shrink-0 items-center justify-between border-b border-slate-200 px-4">
-        <h2 id="tab-content-drawer-title" class="text-base font-semibold text-slate-900">
-          {{ drawerTitle() }}
-        </h2>
+      <header class="flex min-h-16 shrink-0 items-center justify-between border-b border-slate-200 bg-white px-4">
+        <div class="min-w-0">
+          <h2 id="tab-content-drawer-title" class="truncate text-base font-semibold text-slate-950">
+            {{ drawerTitle() }}
+          </h2>
+        </div>
 
         <button type="button"
-          class="inline-flex size-9 items-center justify-center rounded border border-slate-300 text-slate-700 transition hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2"
+          class="inline-flex size-9 shrink-0 items-center justify-center rounded border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:bg-slate-100 hover:text-slate-950 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2"
           aria-label="Close drawer" title="Close" (click)="close()">
-          X
+          <fa-icon [icon]="'xmark'" [fixedWidth]="true"></fa-icon>
         </button>
       </header>
 
-      <div class="flex-1 space-y-4 p-4">
+      <div class="flex-1 space-y-4 overflow-auto p-4">
         @for (column of columns(); track column.name) {
-        <div>
-          <label [for]="'drawer-field-' + column.name" class="block text-sm font-medium text-slate-700">
+        <div class="rounded border border-slate-200 bg-white p-3 shadow-sm">
+          <label [for]="'drawer-field-' + column.name" class="block text-sm font-semibold text-slate-700">
             {{ column.label }}
             @if (column.required) {
             <span class="text-red-600">*</span>
@@ -32,7 +37,8 @@
               [formField]="$any(drawerForm)[column.name]"
               class="size-4 rounded border-slate-300 text-blue-600 focus:ring-blue-600" />
             } @else {
-            <input [id]="'drawer-field-' + column.name" [type]="inputType(column)" [formField]="$any(drawerForm)[column.name]"
+            <input [id]="'drawer-field-' + column.name" [type]="inputType(column)"
+              [formField]="$any(drawerForm)[column.name]"
               class="block w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 read-only:bg-slate-100 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20" />
             }
           </div>
@@ -48,19 +54,20 @@
         }
       </div>
 
-      <footer class="flex shrink-0 justify-end gap-2 border-t border-slate-200 p-4">
+      <footer class="flex shrink-0 justify-end gap-2 border-t border-slate-200 bg-white p-4">
         <button type="button"
-          class="rounded border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2"
+          class="inline-flex items-center gap-2 rounded border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2"
           (click)="close()">
+          <fa-icon [icon]="'xmark'" [fixedWidth]="true"></fa-icon>
           Cancel
         </button>
 
         <button type="submit"
-          class="rounded bg-blue-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2">
+          class="inline-flex items-center gap-2 rounded bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2">
+          <fa-icon [icon]="'check'" [fixedWidth]="true"></fa-icon>
           Apply
         </button>
       </footer>
     </form>
   </aside>
 </div>
-}

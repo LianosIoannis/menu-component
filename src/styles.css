@@ -27,3 +27,7 @@ app-tab-container .mat-mdc-tab-body-content {
 	height: 100%;
 	min-height: 0;
 }
+
+fa-icon .svg-inline--fa {
+	vertical-align: middle;
+}

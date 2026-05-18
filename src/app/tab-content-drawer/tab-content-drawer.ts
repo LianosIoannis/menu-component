@@ -1,5 +1,7 @@
-import { ChangeDetectionStrategy, Component, computed, effect, input, output, signal } from "@angular/core";
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, output, signal } from "@angular/core";
 import { FormField, FormRoot, form, readonly as readonlyField, required } from "@angular/forms/signals";
+import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
+import { FaIconRegistry } from "../services/fa-icon-registry";
 import type {
 	TabContentDrawerColumn,
 	TabContentDrawerFormModel,
@@ -9,14 +11,16 @@ import type {
 
 @Component({
 	selector: "app-tab-content-drawer",
-	imports: [FormField, FormRoot],
+	imports: [FormField, FormRoot, FontAwesomeModule],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: "./tab-content-drawer.html",
 })
 export class TabContentDrawer {
-	readonly open = input(false);
+	protected readonly faIconRegistry = inject(FaIconRegistry);
+
 	readonly columns = input<readonly TabContentDrawerColumn[]>([]);
-	readonly title = input("Drawer");
+	readonly title = input("");
+	readonly open = input(false);
 	readonly orientation = input<TabContentDrawerOrientation>("rtl");
 
 	readonly closed = output<void>();

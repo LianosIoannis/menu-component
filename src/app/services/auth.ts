@@ -9,8 +9,8 @@ export type LoginPayload = {
 	providedIn: "root",
 })
 export class Auth {
-	// private readonly baseUrl = "http://localhost:5000";
-	private readonly baseUrl = "http://10.0.0.5:5000";
+	private readonly baseUrl = "http://localhost:5000";
+	// private readonly baseUrl = "http://10.0.0.5:5000";
 	private readonly TOKEN_KEY = "login_token";
 	private readonly appCode = "futuresoft";
 

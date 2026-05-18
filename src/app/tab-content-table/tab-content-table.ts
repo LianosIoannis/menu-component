@@ -1,4 +1,13 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, output, type Signal } from "@angular/core";
+import {
+	ChangeDetectionStrategy,
+	Component,
+	computed,
+	inject,
+	input,
+	output,
+	type Signal,
+	signal,
+} from "@angular/core";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { AgGridAngular } from "ag-grid-angular";
 import {
@@ -9,12 +18,15 @@ import {
 	type RowSelectionOptions,
 	themeAlpine,
 } from "ag-grid-community";
+import type { MenuItemModel } from "../menu/menuItem.model";
+import { tableData } from "../mock-data/tableData";
 import { AgGridRegistry } from "../services/ag-grid-registry";
 import { FaIconRegistry } from "../services/fa-icon-registry";
+import { TabContentDrawer } from "../tab-content-drawer/tab-content-drawer";
 
 @Component({
 	selector: "app-tab-content-table",
-	imports: [AgGridAngular, FontAwesomeModule],
+	imports: [AgGridAngular, FontAwesomeModule, TabContentDrawer],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: "./tab-content-table.html",
 })
@@ -23,19 +35,13 @@ export class TabContentTable<T extends object> {
 	protected readonly faIconRegistry = inject(FaIconRegistry);
 	protected readonly themeAlpine = themeAlpine.withPart(colorSchemeLightCold);
 
-	readonly rowData = input<T[]>([]);
+	protected readonly drawerOpen = signal(false);
 
-	readonly columnDefsInput = input<ColDef<T>[] | null>(null);
-
+	readonly rowData = input<T[]>(tableData as T[]);
+	readonly menuItem = input.required<MenuItemModel>();
 	readonly rowClicked = output<T>();
 
 	protected readonly columnDefs: Signal<ColDef<T>[]> = computed(() => {
-		const providedColumnDefs = this.columnDefsInput();
-
-		if (providedColumnDefs) {
-			return providedColumnDefs;
-		}
-
 		const rows = this.rowData();
 
 		if (rows.length === 0) {
@@ -74,5 +80,13 @@ export class TabContentTable<T extends object> {
 		}
 
 		this.rowClicked.emit(event.data);
+	}
+
+	protected editClicked(): void {
+		this.drawerOpen.set(true);
+	}
+
+	protected closeDrawer(): void {
+		this.drawerOpen.set(false);
 	}
 }

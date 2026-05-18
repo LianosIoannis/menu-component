@@ -26,20 +26,22 @@
         <fa-icon [icon]="'filter'" [fixedWidth]="true"></fa-icon>
       </button>
 
-      <button type="button"
+      <button type="button" (click)="refreshClicked()" [disabled]="loading()"
         class="inline-flex size-9 items-center justify-center rounded border border-violet-200 bg-violet-50 text-violet-700 transition hover:bg-violet-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-600 focus-visible:ring-offset-2"
         aria-label="Refresh rows" title="Refresh">
-        <fa-icon [icon]="'sync-alt'" [fixedWidth]="true"></fa-icon>
+        <fa-icon [icon]="'sync-alt'" [fixedWidth]="true" [animation]="loading() ? 'spin' : undefined"></fa-icon>
       </button>
 
     </div>
   </header>
 
-  <div class="flex-1 min-h-0">
+  <div class="relative flex-1 min-h-0">
     <ag-grid-angular class="h-full" [rowData]="rowData()" [columnDefs]="columnDefs()" [rowSelection]="rowSelection"
-      [gridOptions]="gridOptions" (rowClicked)="onRowClicked($event)">
+      [gridOptions]="gridOptions" (gridReady)="onGridReady($event)" (firstDataRendered)="onFirstDataRendered($event)"
+      (rowClicked)="onRowClicked($event)">
     </ag-grid-angular>
   </div>
+
 </section>
 
 <app-tab-content-drawer [open]="drawerOpen()" (closed)="closeDrawer()"></app-tab-content-drawer>

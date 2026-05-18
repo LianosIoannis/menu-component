@@ -23,7 +23,8 @@
         </ng-template>
 
         <div class="h-full min-h-0 overflow-auto">
-            <app-tab-content-table class="block h-full min-h-0" [menuItem]="tab.menuItem"></app-tab-content-table>
+            <app-tab-content-table class="block h-full min-h-0" [menuItem]="tab.menuItem"
+                [active]="tab.id === activeTabId()"></app-tab-content-table>
         </div>
     </mat-tab>
     }

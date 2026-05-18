@@ -1,6 +1,6 @@
 import type { ColDef, ValueFormatterParams } from "ag-grid-community";
 import dayjs from "dayjs";
-import type { TableColumnParams } from "../menu/menuItem.model";
+import type { TableColumnParams, TableColumnType } from "../menu/menuItem.model";
 
 export function createColumnDefs<T extends object>(columns: readonly TableColumnParams[]): ColDef<T>[] {
 	return columns
@@ -11,10 +11,30 @@ export function createColumnDefs<T extends object>(columns: readonly TableColumn
 				headerName: column.label ?? column.name,
 				sortable: column.sortable ?? true,
 				filter: column.filterable ?? true,
-				flex: 1,
+				cellDataType: createCellDataType(column.type),
 				valueFormatter: createValueFormatter(column),
 			}),
 		);
+}
+
+function createCellDataType(type: TableColumnType): ColDef["cellDataType"] {
+	switch (type) {
+		case "number":
+			return "number";
+
+		case "boolean":
+			return "boolean";
+
+		case "date":
+			return "dateString";
+
+		case "datetime":
+		case "time":
+			return "dateTimeString";
+
+		default:
+			return "text";
+	}
 }
 
 function createValueFormatter<T extends object>(column: TableColumnParams): ColDef<T>["valueFormatter"] {

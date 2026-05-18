@@ -107,7 +107,7 @@ export const menuData: MenuDataModel = {
 						{
 							name: "birthday",
 							label: "Birthday",
-							type: "datetime",
+							type: "date",
 							retrieve: true,
 							insert: true,
 							update: true,

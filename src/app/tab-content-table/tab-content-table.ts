@@ -2,18 +2,23 @@ import {
 	ChangeDetectionStrategy,
 	Component,
 	computed,
+	effect,
 	inject,
 	input,
 	output,
 	type Signal,
 	signal,
+	untracked,
 } from "@angular/core";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { AgGridAngular } from "ag-grid-angular";
 import {
 	type ColDef,
 	colorSchemeLightCold,
+	type FirstDataRenderedEvent,
+	type GridApi,
 	type GridOptions,
+	type GridReadyEvent,
 	type RowClickedEvent,
 	type RowSelectionOptions,
 	themeAlpine,
@@ -23,6 +28,7 @@ import { tableData } from "../mock-data/tableData";
 import { AgGridRegistry } from "../services/ag-grid-registry";
 import { FaIconRegistry } from "../services/fa-icon-registry";
 import { TabContentDrawer } from "../tab-content-drawer/tab-content-drawer";
+import { createColumnDefs } from "./table.utils";
 
 @Component({
 	selector: "app-tab-content-table",
@@ -31,48 +37,69 @@ import { TabContentDrawer } from "../tab-content-drawer/tab-content-drawer";
 	templateUrl: "./tab-content-table.html",
 })
 export class TabContentTable<T extends object> {
-	protected readonly agGridRegistry = inject(AgGridRegistry);
-	protected readonly faIconRegistry = inject(FaIconRegistry);
-	protected readonly themeAlpine = themeAlpine.withPart(colorSchemeLightCold);
 
-	protected readonly drawerOpen = signal(false);
+	private gridApi: GridApi<T> | undefined;
+	private columnsAutoSized = false;
 
-	readonly rowData = input<T[]>(tableData as T[]);
-	readonly menuItem = input.required<MenuItemModel>();
-	readonly rowClicked = output<T>();
+	drawerData = signal<Record<string, unknown>>({});
 
-	protected readonly columnDefs: Signal<ColDef<T>[]> = computed(() => {
-		const rows = this.rowData();
+	agGridRegistry = inject(AgGridRegistry);
+	faIconRegistry = inject(FaIconRegistry);
+	themeAlpine = themeAlpine.withPart(colorSchemeLightCold);
 
-		if (rows.length === 0) {
+	drawerOpen = signal(false);
+	loading = signal(false);
+	rowData = signal<T[]>(tableData as T[]);
+
+	active = input(false);
+	menuItem = input.required<MenuItemModel>();
+	rowClicked = output<T>();
+
+
+	columnDefs: Signal<ColDef<T>[]> = computed(() => {
+		const table = this.menuItem().params?.table;
+
+		if (!table) {
 			return [];
 		}
 
-		return Object.keys(rows[0]).map(
-			(key): ColDef<T> => ({
-				field: key as ColDef<T>["field"],
-				filter: true,
-				sortable: true,
-				editable: false,
-				minWidth: 100,
-			}),
-		);
+		return createColumnDefs<T>(table.columns);
 	});
 
-	protected readonly rowSelection: RowSelectionOptions = {
+	retrieveEffect = effect(() => {
+		const table = this.menuItem().params?.table;
+	});
+
+	activeTabEffect = effect(() => {
+		if (this.active()) {
+			untracked(() => this.autoSizeColumnsOnceAfterDataLoaded());
+		}
+	});
+
+
+	rowSelection: RowSelectionOptions = {
 		mode: "singleRow",
 		enableClickSelection: true,
 		checkboxes: false,
 	};
 
-	protected readonly gridOptions: GridOptions<T> = {
+	gridOptions: GridOptions<T> = {
 		theme: this.themeAlpine,
 		suppressCellFocus: true,
 		pagination: true,
 		paginationPageSize: 50,
 		paginationPageSizeSelector: [50, 100, 250, 1000],
 		autoSizeStrategy: { type: "fitCellContents" },
+		rowSelection: this.rowSelection,
 	};
+
+	protected onGridReady(event: GridReadyEvent<T>): void {
+		this.gridApi = event.api;
+	}
+
+	protected onFirstDataRendered(_: FirstDataRenderedEvent<T>): void {
+		this.autoSizeColumnsOnceAfterDataLoaded();
+	}
 
 	protected onRowClicked(event: RowClickedEvent<T>): void {
 		if (!event.data) {
@@ -88,5 +115,18 @@ export class TabContentTable<T extends object> {
 
 	protected closeDrawer(): void {
 		this.drawerOpen.set(false);
+	}
+
+	protected refreshClicked(): void {
+		
+	}
+
+	private autoSizeColumnsOnceAfterDataLoaded(): void {
+		if (this.columnsAutoSized || !this.active() || !this.gridApi) {
+			return;
+		}
+
+		this.gridApi.autoSizeAllColumns(false);
+		this.columnsAutoSized = true;
 	}
 }

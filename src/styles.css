@@ -29,5 +29,6 @@ app-tab-container .mat-mdc-tab-body-content {
 }
 
 fa-icon .svg-inline--fa {
-	vertical-align: middle;
+	/* biome-ignore lint/complexity/noImportantStyles: <fa-icon> */
+	vertical-align: middle !important;
 }

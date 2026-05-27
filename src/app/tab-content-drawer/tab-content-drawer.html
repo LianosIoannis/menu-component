@@ -2,7 +2,7 @@
   [class.justify-end]="isRtl()" [class.justify-start]="!isRtl()" [class.opacity-100]="open()"
   [class.opacity-0]="!open()" [class.pointer-events-none]="!open()">
   <aside
-    class="h-full w-full max-w-md transform overflow-hidden bg-slate-50 shadow-2xl transition-transform duration-300 ease-in-out"
+    class="h-full w-full max-w-xl transform overflow-hidden bg-slate-50 shadow-2xl transition-transform duration-300 ease-in-out"
     [class.translate-x-0]="open()" [class.translate-x-full]="isRtl() && !open()"
     [class.-translate-x-full]="!isRtl() && !open()" [class.border-l]="isRtl()" [class.border-r]="!isRtl()"
     [class.border-slate-200]="true" aria-labelledby="tab-content-drawer-title">
@@ -14,7 +14,7 @@
           </h2>
         </div>
 
-        <div class="flex shrink-0 items-center gap-2">
+        <div class="ml-4 flex min-w-40 flex-1 items-center justify-between gap-2">
           <button type="submit"
             class="inline-flex items-center gap-2 rounded bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2">
             <fa-icon [icon]="'check'" [fixedWidth]="true"></fa-icon>

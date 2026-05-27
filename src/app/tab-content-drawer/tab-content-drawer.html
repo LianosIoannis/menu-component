@@ -1,12 +1,12 @@
 <div class="absolute inset-0 z-20 flex bg-slate-950/30 transition-opacity duration-300 ease-in-out"
   [class.justify-end]="isRtl()" [class.justify-start]="!isRtl()" [class.opacity-100]="open()"
   [class.opacity-0]="!open()" [class.pointer-events-none]="!open()">
-  <aside class="h-full w-full max-w-md transform overflow-auto bg-slate-50 shadow-2xl transition-transform duration-300 ease-in-out"
+  <aside
+    class="h-full w-full max-w-md transform overflow-auto bg-slate-50 shadow-2xl transition-transform duration-300 ease-in-out"
     [class.translate-x-0]="open()" [class.translate-x-full]="isRtl() && !open()"
     [class.-translate-x-full]="!isRtl() && !open()" [class.border-l]="isRtl()" [class.border-r]="!isRtl()"
-    [class.border-slate-200]="true" [attr.dir]="orientation()"
-    aria-labelledby="tab-content-drawer-title">
-    <form [formRoot]="drawerForm" class="flex min-h-full flex-col" (submit)="submit()">
+    [class.border-slate-200]="true" [attr.dir]="orientation()" aria-labelledby="tab-content-drawer-title">
+    <form [formGroup]="drawerForm()" class="flex min-h-full flex-col" (ngSubmit)="submit()">
       <header class="flex min-h-16 shrink-0 items-center justify-between border-b border-slate-200 bg-white px-4">
         <div class="min-w-0">
           <h2 id="tab-content-drawer-title" class="truncate text-base font-semibold text-slate-950">
@@ -33,21 +33,18 @@
 
           <div class="mt-1">
             @if (column.type === "boolean") {
-            <input [id]="'drawer-field-' + column.name" [type]="inputType(column)"
-              [formField]="$any(drawerForm)[column.name]"
+            <input [id]="'drawer-field-' + column.name" [type]="inputType(column)" [formControlName]="column.name"
               class="size-4 rounded border-slate-300 text-blue-600 focus:ring-blue-600" />
             } @else {
-            <input [id]="'drawer-field-' + column.name" [type]="inputType(column)"
-              [formField]="$any(drawerForm)[column.name]"
-              class="block w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 read-only:bg-slate-100 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20" />
+            <input [id]="'drawer-field-' + column.name" [type]="inputType(column)" [formControlName]="column.name"
+              [readOnly]="column.readonly === true"
+              class="block w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 read-only:bg-slate-100 disabled:bg-slate-100 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20" />
             }
           </div>
 
-          @if ($any(drawerForm)[column.name]().touched() && $any(drawerForm)[column.name]().invalid()) {
+          @if (drawerForm().controls[column.name].touched && drawerForm().controls[column.name].invalid) {
           <div class="mt-2 text-sm text-red-600">
-            @for (error of $any(drawerForm)[column.name]().errors(); track error) {
-            <p>{{ error.message }}</p>
-            }
+            <p>{{ fieldError(column) }}</p>
           </div>
           }
         </div>

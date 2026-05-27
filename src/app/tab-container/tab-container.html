@@ -5,7 +5,7 @@
     @for (tab of tabs(); track tab.id) {
     <mat-tab>
         <ng-template mat-tab-label>
-            <div class="flex items-center justify-center" (auxclick)="closeTab($event, tab.id)">
+            <div class="flex items-center justify-center cursor-pointer" (auxclick)="closeTab($event, tab.id)">
 
                 @if (tab.menuItem.icon) {
                 <fa-icon class="text-base" [class]="tab.menuItem.iconColor || 'text-yellow-500'"
@@ -19,7 +19,7 @@
 
                 @if (tab.closable !== false) {
                 <button type="button" class="ml-1 scale-75" aria-label="Close tab" (click)="closeTab($event, tab.id)">
-                    <fa-icon class="text-base" [class]="'text-red-400 hover:text-red-600'" [icon]="'xmark'">
+                    <fa-icon class="text-base cursor-pointer" [class]="'text-red-400 hover:text-red-600'" [icon]="'xmark'">
                     </fa-icon>
                 </button>
                 }

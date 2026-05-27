@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, output, signal } from "@angular/core";
-import { FormField, FormRoot, form, readonly as readonlyField, required } from "@angular/forms/signals";
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { FaIconRegistry } from "../services/fa-icon-registry";
 import type {
@@ -11,7 +11,7 @@ import type {
 
 @Component({
 	selector: "app-tab-content-drawer",
-	imports: [FormField, FormRoot, FontAwesomeModule],
+	imports: [ReactiveFormsModule, FontAwesomeModule],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: "./tab-content-drawer.html",
 })
@@ -26,26 +26,13 @@ export class TabContentDrawer {
 	readonly closed = output<void>();
 	readonly submitted = output<TabContentDrawerFormModel>();
 
-	protected readonly drawerModel = signal<TabContentDrawerFormModel>({});
-	protected readonly drawerForm = form(this.drawerModel, (path) => {
-		for (const column of this.columns()) {
-			const fieldPath = path[column.name];
-
-			if (column.required) {
-				required(fieldPath, { message: `${column.label} is required` });
-			}
-
-			if (column.readonly) {
-				readonlyField(fieldPath);
-			}
-		}
-	});
+	protected readonly drawerForm = signal(this.createFormGroup([]));
 
 	protected readonly drawerTitle = computed(() => this.title());
 	protected readonly isRtl = computed(() => this.orientation() === "rtl");
 
 	protected readonly modelEffect = effect(() => {
-		this.drawerModel.set(this.createFormModel(this.columns()));
+		this.drawerForm.set(this.createFormGroup(this.columns()));
 	});
 
 	protected inputType(column: TabContentDrawerColumn): string {
@@ -62,9 +49,22 @@ export class TabContentDrawer {
 			case "time":
 				return "time";
 
+			case "boolean":
+				return "checkbox";
+
 			default:
 				return "text";
 		}
+	}
+
+	protected fieldError(column: TabContentDrawerColumn): string {
+		const control = this.drawerForm().controls[column.name];
+
+		if (control?.hasError("required")) {
+			return `${column.label} is required`;
+		}
+
+		return "";
 	}
 
 	protected close(): void {
@@ -72,11 +72,36 @@ export class TabContentDrawer {
 	}
 
 	protected submit(): void {
-		this.submitted.emit(this.drawerModel());
+		this.drawerForm().markAllAsTouched();
+
+		if (this.drawerForm().invalid) {
+			return;
+		}
+
+		this.submitted.emit(this.drawerForm().getRawValue());
 	}
 
-	private createFormModel(columns: readonly TabContentDrawerColumn[]): TabContentDrawerFormModel {
-		return Object.fromEntries(columns.map((column) => [column.name, column.defaultValue ?? this.defaultValue(column)]));
+	private createFormGroup(columns: readonly TabContentDrawerColumn[]): FormGroup<
+		Record<string, FormControl<TabContentDrawerValue>>
+	> {
+		const controls = Object.fromEntries(
+			columns.map((column) => {
+				const value = column.defaultValue ?? this.defaultValue(column);
+
+				return [
+					column.name,
+					new FormControl(
+						{ value, disabled: column.readonly === true },
+						{
+							nonNullable: false,
+							validators: column.required ? [Validators.required] : [],
+						},
+					),
+				];
+			}),
+		);
+
+		return new FormGroup(controls);
 	}
 
 	private defaultValue(column: TabContentDrawerColumn): TabContentDrawerValue {

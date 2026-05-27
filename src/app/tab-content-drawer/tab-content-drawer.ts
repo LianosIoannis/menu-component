@@ -18,7 +18,7 @@ import type {
 export class TabContentDrawer {
 	protected readonly faIconRegistry = inject(FaIconRegistry);
 
-	readonly columns = input<readonly TabContentDrawerColumn[]>([]);
+	readonly columns = input<TabContentDrawerColumn[]>([]);
 	readonly title = input("");
 	readonly open = input(false);
 	readonly orientation = input<TabContentDrawerOrientation>("rtl");

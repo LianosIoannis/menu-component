@@ -18,7 +18,6 @@ import {
 	type FirstDataRenderedEvent,
 	type GridApi,
 	type GridOptions,
-	type GridReadyEvent,
 	type RowClickedEvent,
 	type RowSelectionOptions,
 	themeAlpine,
@@ -28,6 +27,7 @@ import { tableData } from "../mock-data/tableData";
 import { AgGridRegistry } from "../services/ag-grid-registry";
 import { FaIconRegistry } from "../services/fa-icon-registry";
 import { TabContentDrawer } from "../tab-content-drawer/tab-content-drawer";
+import type { TabContentDrawerColumn } from "../tab-content-drawer/tab-content-drawer.model";
 import { createColumnDefs } from "./table.utils";
 
 @Component({
@@ -37,7 +37,6 @@ import { createColumnDefs } from "./table.utils";
 	templateUrl: "./tab-content-table.html",
 })
 export class TabContentTable<T extends object> {
-
 	private gridApi: GridApi<T> | undefined;
 	private columnsAutoSized = false;
 
@@ -55,6 +54,7 @@ export class TabContentTable<T extends object> {
 	menuItem = input.required<MenuItemModel>();
 	rowClicked = output<T>();
 
+	criteriaColumns = signal<TabContentDrawerColumn[]>([]);
 
 	columnDefs: Signal<ColDef<T>[]> = computed(() => {
 		const table = this.menuItem().params?.table;
@@ -66,16 +66,11 @@ export class TabContentTable<T extends object> {
 		return createColumnDefs<T>(table.columns);
 	});
 
-	retrieveEffect = effect(() => {
-		const table = this.menuItem().params?.table;
-	});
-
 	activeTabEffect = effect(() => {
 		if (this.active()) {
 			untracked(() => this.autoSizeColumnsOnceAfterDataLoaded());
 		}
 	});
-
 
 	rowSelection: RowSelectionOptions = {
 		mode: "singleRow",
@@ -93,10 +88,6 @@ export class TabContentTable<T extends object> {
 		rowSelection: this.rowSelection,
 	};
 
-	protected onGridReady(event: GridReadyEvent<T>): void {
-		this.gridApi = event.api;
-	}
-
 	protected onFirstDataRendered(_: FirstDataRenderedEvent<T>): void {
 		this.autoSizeColumnsOnceAfterDataLoaded();
 	}
@@ -109,17 +100,21 @@ export class TabContentTable<T extends object> {
 		this.rowClicked.emit(event.data);
 	}
 
+	createCriteriaColumns(): TabContentDrawerColumn[] {
+		return [];
+	}
+
 	protected editClicked(): void {
+		this.criteriaColumns.set(this.createCriteriaColumns());
 		this.drawerOpen.set(true);
 	}
 
 	protected closeDrawer(): void {
+		this.criteriaColumns.set([]);
 		this.drawerOpen.set(false);
 	}
 
-	protected refreshClicked(): void {
-		
-	}
+	protected refreshClicked(): void {}
 
 	private autoSizeColumnsOnceAfterDataLoaded(): void {
 		if (this.columnsAutoSized || !this.active() || !this.gridApi) {

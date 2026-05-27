@@ -4,6 +4,7 @@ import { nanoid } from "nanoid";
 import { NgxSpinnerComponent, NgxSpinnerService } from "ngx-spinner";
 import { Menu } from "./menu/menu";
 import type { MenuItemModel } from "./menu/menuItem.model";
+import { transformMenuDataModel } from "./menu/menuTransformer";
 import { menuData } from "./mock-data/menuData";
 import { Auth } from "./services/auth";
 import { Data } from "./services/data";
@@ -28,7 +29,7 @@ export class App {
 	faIconRegistry = inject(FaIconRegistry);
 
 	selectedMenuItem = signal<MenuItemModel | null>(null);
-	menuData = signal(menuData);
+	menuData = signal(transformMenuDataModel(menuData));
 	tabs = signal<TabModel[]>([]);
 	activeTabId = signal<string | null>(null);
 

@@ -36,12 +36,11 @@
   </header>
 
   <div class="relative flex-1 min-h-0">
-    <ag-grid-angular class="h-full" [rowData]="rowData()" [columnDefs]="columnDefs()" [rowSelection]="rowSelection"
-      [gridOptions]="gridOptions" (gridReady)="onGridReady($event)" (firstDataRendered)="onFirstDataRendered($event)"
+    <ag-grid-angular class="h-full" [gridOptions]="gridOptions" (firstDataRendered)="onFirstDataRendered($event)"
       (rowClicked)="onRowClicked($event)">
     </ag-grid-angular>
   </div>
 
 </section>
 
-<app-tab-content-drawer [open]="drawerOpen()" (closed)="closeDrawer()"></app-tab-content-drawer>
+<app-tab-content-drawer [open]="drawerOpen()" (closed)="closeDrawer()" [columns]="criteriaColumns()"></app-tab-content-drawer>

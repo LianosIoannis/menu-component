@@ -18,17 +18,19 @@ import {
 	type FirstDataRenderedEvent,
 	type GridApi,
 	type GridOptions,
+	type GridReadyEvent,
 	type RowClickedEvent,
 	type RowSelectionOptions,
 	themeAlpine,
 } from "ag-grid-community";
-import type { MenuItemModel } from "../menu/menuItem.model";
-import { tabContentDrawerTestData } from "../mock-data/tabContentDrawerTest";
-import { tableData } from "../mock-data/tableData";
+import type { Criteria, MenuItemModel, Row, SelectInput, SelectOutput } from "../menu/menuItem.model";
 import { AgGridRegistry } from "../services/ag-grid-registry";
+import { Data } from "../services/data";
 import { FaIconRegistry } from "../services/fa-icon-registry";
 import { TabContentDrawer } from "../tab-content-drawer/tab-content-drawer";
-import type { TabContentDrawerColumn } from "../tab-content-drawer/tab-content-drawer.model";
+import type { TabContentDrawerColumn, TabContentDrawerFormModel } from "../tab-content-drawer/tab-content-drawer.model";
+import { createDrawerScenarios } from "./drawer.utils";
+import { runHandler } from "./query.utils";
 import { createColumnDefs } from "./table.utils";
 
 @Component({
@@ -44,18 +46,21 @@ export class TabContentTable<T extends object> {
 	drawerData = signal<Record<string, unknown>>({});
 
 	agGridRegistry = inject(AgGridRegistry);
+	data = inject(Data);
 	faIconRegistry = inject(FaIconRegistry);
 	themeAlpine = themeAlpine.withPart(colorSchemeLightCold);
 
 	drawerOpen = signal(false);
 	loading = signal(false);
-	rowData = signal<T[]>(tableData as T[]);
+	rowData = signal<T[]>([]);
+	criteria = signal<Criteria>({});
 
 	active = input(false);
 	menuItem = input.required<MenuItemModel>();
 	rowClicked = output<T>();
 
 	criteriaColumns = signal<TabContentDrawerColumn[]>([]);
+	drawerTitle = signal("");
 
 	columnDefs: Signal<ColDef<T>[]> = computed(() => {
 		const table = this.menuItem().params?.table;
@@ -69,7 +74,10 @@ export class TabContentTable<T extends object> {
 
 	activeTabEffect = effect(() => {
 		if (this.active()) {
-			untracked(() => this.autoSizeColumnsOnceAfterDataLoaded());
+			untracked(() => {
+				this.autoSizeColumnsOnceAfterDataLoaded();
+				void this.loadRows();
+			});
 		}
 	});
 
@@ -89,6 +97,11 @@ export class TabContentTable<T extends object> {
 		rowSelection: this.rowSelection,
 	};
 
+	protected onGridReady(event: GridReadyEvent<T>): void {
+		this.gridApi = event.api;
+		this.autoSizeColumnsOnceAfterDataLoaded();
+	}
+
 	protected onFirstDataRendered(_: FirstDataRenderedEvent<T>): void {
 		this.autoSizeColumnsOnceAfterDataLoaded();
 	}
@@ -101,21 +114,57 @@ export class TabContentTable<T extends object> {
 		this.rowClicked.emit(event.data);
 	}
 
-	createCriteriaColumns(): TabContentDrawerColumn[] {
-		return tabContentDrawerTestData.criteria.columns;
+	protected editClicked(): void {
+		const scenario = createDrawerScenarios(this.menuItem()).criteria;
+
+		this.drawerTitle.set(scenario.title);
+		this.criteriaColumns.set(scenario.columns);
+		this.drawerOpen.set(true);
 	}
 
-	protected editClicked(): void {
-		this.criteriaColumns.set(this.createCriteriaColumns());
-		this.drawerOpen.set(true);
+	protected async criteriaSubmitted(criteria: TabContentDrawerFormModel): Promise<void> {
+		this.criteria.set(criteria);
+		this.closeDrawer();
+		await this.loadRows();
 	}
 
 	protected closeDrawer(): void {
 		this.criteriaColumns.set([]);
+		this.drawerTitle.set("");
 		this.drawerOpen.set(false);
 	}
 
-	protected refreshClicked(): void {}
+	protected async refreshClicked(): Promise<void> {
+		await this.loadRows();
+	}
+
+	private async loadRows(): Promise<void> {
+		const select = this.menuItem().params?.table?.handlers?.select;
+
+		if (!select) {
+			this.rowData.set([]);
+			return;
+		}
+
+		this.loading.set(true);
+
+		try {
+			const rows = await runHandler<SelectInput, SelectOutput>(
+				select,
+				{ criteria: this.criteria() },
+				this.data.execQuery.bind(this.data),
+			);
+
+			this.rowData.set(rows as T[]);
+			this.columnsAutoSized = false;
+			this.autoSizeColumnsOnceAfterDataLoaded();
+		} catch (error: unknown) {
+			console.error(error);
+			this.rowData.set([]);
+		} finally {
+			this.loading.set(false);
+		}
+	}
 
 	private autoSizeColumnsOnceAfterDataLoaded(): void {
 		if (this.columnsAutoSized || !this.active() || !this.gridApi) {

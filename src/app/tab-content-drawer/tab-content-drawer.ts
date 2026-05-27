@@ -34,6 +34,7 @@ type TabContentDrawerControlValue = CriteriaOperator | Date | TabContentDrawerVa
 	],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: "./tab-content-drawer.html",
+	styleUrl: "./tab-content-drawer.css",
 })
 export class TabContentDrawer {
 	protected readonly faIconRegistry = inject(FaIconRegistry);
@@ -45,14 +46,24 @@ export class TabContentDrawer {
 
 	readonly closed = output<void>();
 	readonly submitted = output<TabContentDrawerFormModel>();
+	readonly valueChanged = output<TabContentDrawerFormModel>();
 
 	protected readonly drawerForm = signal(this.createFormGroup([]));
 
 	protected readonly drawerTitle = computed(() => this.title());
 	protected readonly isRtl = computed(() => this.orientation() === "rtl");
 
-	protected readonly modelEffect = effect(() => {
-		this.drawerForm.set(this.createFormGroup(this.columns()));
+	protected readonly modelEffect = effect((onCleanup) => {
+		const form = this.createFormGroup(this.columns());
+		this.drawerForm.set(form);
+
+		const subscription = form.valueChanges.subscribe(() => {
+			this.valueChanged.emit(this.createFormModel());
+		});
+
+		onCleanup(() => {
+			subscription.unsubscribe();
+		});
 	});
 
 	protected inputType(column: TabContentDrawerColumn): string {
@@ -128,7 +139,8 @@ export class TabContentDrawer {
 			return;
 		}
 
-		this.submitted.emit(this.createFormModel());
+		const formModel = this.createFormModel();
+		this.submitted.emit(formModel);
 	}
 
 	private createFormGroup(

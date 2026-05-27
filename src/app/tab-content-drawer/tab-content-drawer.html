@@ -42,9 +42,10 @@
           <p class="mt-2 text-sm text-red-600">{{ fieldError(column) }}</p>
           }
           } @else {
-          <div class="flex items-start gap-2">
+          <div class="flex items-center gap-2">
             @if (showsOperator(column)) {
-            <mat-form-field appearance="outline" class="w-32 shrink-0" [matTooltip]="operatorTooltip(column)">
+            <mat-form-field appearance="outline" subscriptSizing="dynamic" class="operator-field w-28 shrink-0"
+              [matTooltip]="operatorTooltip(column)">
               <mat-label>Op</mat-label>
               <mat-select [formControlName]="operatorControlName(column)" required>
                 @for (operator of allowedOperators(column); track operator) {
@@ -55,7 +56,7 @@
             }
 
             @if (hasAvailableValues(column)) {
-            <mat-form-field appearance="outline" class="min-w-0 flex-1">
+            <mat-form-field appearance="outline" subscriptSizing="dynamic" class="value-field min-w-0 flex-1">
               <mat-label>{{ column.label }}</mat-label>
               <mat-select [id]="'drawer-field-' + column.name" [formControlName]="column.name"
                 [multiple]="column.multiple === true" [required]="column.required === true">
@@ -68,7 +69,7 @@
               }
             </mat-form-field>
             } @else if (column.type === "date") {
-            <mat-form-field appearance="outline" class="min-w-0 flex-1">
+            <mat-form-field appearance="outline" subscriptSizing="dynamic" class="value-field min-w-0 flex-1">
               <mat-label>{{ column.label }}</mat-label>
               <input matInput [id]="'drawer-field-' + column.name" [matDatepicker]="datePicker"
                 [formControlName]="column.name" [readOnly]="column.readonly === true"
@@ -80,7 +81,7 @@
               }
             </mat-form-field>
             } @else {
-            <mat-form-field appearance="outline" class="min-w-0 flex-1">
+            <mat-form-field appearance="outline" subscriptSizing="dynamic" class="value-field min-w-0 flex-1">
               <mat-label>{{ column.label }}</mat-label>
               <input matInput [id]="'drawer-field-' + column.name" [type]="inputType(column)"
                 [formControlName]="column.name" [readOnly]="column.readonly === true"

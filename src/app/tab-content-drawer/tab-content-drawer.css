@@ -1,0 +1,39 @@
+/** biome-ignore-all lint/correctness/noUnknownPseudoElement: <explanation> */
+:host {
+	display: contents;
+}
+
+:host ::ng-deep .operator-field {
+	--mdc-outlined-text-field-container-shape: 8px;
+	--mdc-outlined-text-field-outline-color: #cbd5e1;
+	--mdc-outlined-text-field-hover-outline-color: #64748b;
+	--mdc-outlined-text-field-focus-outline-color: #0f766e;
+	--mdc-outlined-text-field-label-text-color: #475569;
+	--mdc-outlined-text-field-input-text-color: #0f172a;
+	--mat-select-enabled-trigger-text-color: #0f172a;
+}
+
+:host ::ng-deep .operator-field .mat-mdc-text-field-wrapper {
+	background: #f8fafc;
+	box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.7);
+}
+
+:host ::ng-deep .operator-field .mat-mdc-form-field-infix {
+	min-height: 42px;
+	padding-top: 10px;
+	padding-bottom: 8px;
+}
+
+:host ::ng-deep .operator-field .mat-mdc-select-value {
+	font-size: 0.8125rem;
+	font-weight: 700;
+}
+
+:host ::ng-deep .operator-field .mat-mdc-select-arrow {
+	color: #0f766e;
+}
+
+:host ::ng-deep .value-field {
+	--mdc-outlined-text-field-container-shape: 8px;
+	--mdc-outlined-text-field-focus-outline-color: #2563eb;
+}

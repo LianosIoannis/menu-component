@@ -37,10 +37,12 @@
 
   <div class="relative flex-1 min-h-0">
     <ag-grid-angular class="h-full" [gridOptions]="gridOptions" (firstDataRendered)="onFirstDataRendered($event)"
+      [columnDefs]="columnDefs()" [rowData]="rowData()" [loading]="loading()" (gridReady)="onGridReady($event)"
       (rowClicked)="onRowClicked($event)">
     </ag-grid-angular>
   </div>
 
 </section>
 
-<app-tab-content-drawer [open]="drawerOpen()" (closed)="closeDrawer()" [columns]="criteriaColumns()"></app-tab-content-drawer>
+<app-tab-content-drawer [open]="drawerOpen()" [title]="drawerTitle()" (closed)="closeDrawer()"
+  (submitted)="criteriaSubmitted($event)" [columns]="criteriaColumns()"></app-tab-content-drawer>

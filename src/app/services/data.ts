@@ -11,8 +11,8 @@ export type QueryResult = {
 	providedIn: "root",
 })
 export class Data {
-	private readonly baseUrl = "http://localhost:5000/fs_timer_mob";
-	// private readonly baseUrl = "http://10.0.0.5:5000/fs_timer_mob";
+	// private readonly baseUrl = "http://localhost:5000/fs_timer_mob";
+	private readonly baseUrl = "http://10.0.0.5:5000/fs_timer_mob";
 	auth = inject(Auth);
 	loading = signal(false);
 

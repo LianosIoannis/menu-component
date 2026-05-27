@@ -23,6 +23,7 @@ import {
 	themeAlpine,
 } from "ag-grid-community";
 import type { MenuItemModel } from "../menu/menuItem.model";
+import { tabContentDrawerTestData } from "../mock-data/tabContentDrawerTest";
 import { tableData } from "../mock-data/tableData";
 import { AgGridRegistry } from "../services/ag-grid-registry";
 import { FaIconRegistry } from "../services/fa-icon-registry";
@@ -101,7 +102,7 @@ export class TabContentTable<T extends object> {
 	}
 
 	createCriteriaColumns(): TabContentDrawerColumn[] {
-		return [];
+		return tabContentDrawerTestData.criteria.columns;
 	}
 
 	protected editClicked(): void {

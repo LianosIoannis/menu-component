@@ -1,15 +1,32 @@
-import type { TableColumnType } from "../menu/menuItem.model";
+import type { CriteriaOperator, TableColumnType } from "../menu/menuItem.model";
 
-export type TabContentDrawerValue = string | number | boolean | null;
+export type { CriteriaOperator };
 
-export type TabContentDrawerFormModel = Record<string, TabContentDrawerValue>;
+export type TabContentDrawerScalarValue = string | number | boolean | null;
+
+export type TabContentDrawerValue = TabContentDrawerScalarValue | TabContentDrawerScalarValue[];
+
+export type TabContentDrawerOperatorValue = {
+	operator: CriteriaOperator;
+	value: TabContentDrawerValue;
+};
+
+export type TabContentDrawerFormModel = Record<string, TabContentDrawerValue | TabContentDrawerOperatorValue>;
 
 export type TabContentDrawerOrientation = "ltr" | "rtl";
+
+export type TabContentDrawerAvailableValue = {
+	value: Exclude<TabContentDrawerScalarValue, null>;
+	text: string;
+};
 
 export type TabContentDrawerColumn = {
 	name: string;
 	label: string;
 	type: TableColumnType;
+	allowedOperators?: CriteriaOperator[];
+	availableValues?: TabContentDrawerAvailableValue[];
+	multiple?: boolean;
 	required?: boolean;
 	defaultValue?: TabContentDrawerValue;
 	readonly?: boolean;

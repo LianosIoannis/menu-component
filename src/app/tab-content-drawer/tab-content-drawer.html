@@ -2,11 +2,11 @@
   [class.justify-end]="isRtl()" [class.justify-start]="!isRtl()" [class.opacity-100]="open()"
   [class.opacity-0]="!open()" [class.pointer-events-none]="!open()">
   <aside
-    class="h-full w-full max-w-md transform overflow-auto bg-slate-50 shadow-2xl transition-transform duration-300 ease-in-out"
+    class="h-full w-full max-w-md transform overflow-hidden bg-slate-50 shadow-2xl transition-transform duration-300 ease-in-out"
     [class.translate-x-0]="open()" [class.translate-x-full]="isRtl() && !open()"
     [class.-translate-x-full]="!isRtl() && !open()" [class.border-l]="isRtl()" [class.border-r]="!isRtl()"
-    [class.border-slate-200]="true" [attr.dir]="orientation()" aria-labelledby="tab-content-drawer-title">
-    <form [formGroup]="drawerForm()" class="flex min-h-full flex-col" (ngSubmit)="submit()">
+    [class.border-slate-200]="true" aria-labelledby="tab-content-drawer-title">
+    <form [formGroup]="drawerForm()" class="flex h-full min-h-0 flex-col" (ngSubmit)="submit()">
       <header class="flex min-h-16 shrink-0 items-center justify-between border-b border-slate-200 bg-white px-4">
         <div class="min-w-0">
           <h2 id="tab-content-drawer-title" class="truncate text-base font-semibold text-slate-950">
@@ -14,57 +14,76 @@
           </h2>
         </div>
 
-        <button type="button"
-          class="inline-flex size-9 shrink-0 items-center justify-center rounded border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:bg-slate-100 hover:text-slate-950 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2"
-          aria-label="Close drawer" title="Close" (click)="close()">
-          <fa-icon [icon]="'xmark'" [fixedWidth]="true"></fa-icon>
-        </button>
+        <div class="flex shrink-0 items-center gap-2">
+          <button type="submit"
+            class="inline-flex items-center gap-2 rounded bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2">
+            <fa-icon [icon]="'check'" [fixedWidth]="true"></fa-icon>
+            Apply
+          </button>
+
+          <button type="button"
+            class="inline-flex items-center gap-2 rounded border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700 shadow-sm transition hover:bg-red-100 hover:text-red-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-600 focus-visible:ring-offset-2"
+            aria-label="Close drawer" title="Close" (click)="close()">
+            <fa-icon [icon]="'xmark'" [fixedWidth]="true"></fa-icon>
+            Cancel
+          </button>
+        </div>
       </header>
 
-      <div class="flex-1 space-y-4 overflow-auto p-4">
+      <div class="min-h-0 flex-1 space-y-4 overflow-y-auto p-4">
         @for (column of columns(); track column.name) {
         <div class="rounded border border-slate-200 bg-white p-3 shadow-sm">
-          <label [for]="'drawer-field-' + column.name" class="block text-sm font-semibold text-slate-700">
+          @if (column.type === "boolean") {
+          <mat-checkbox [id]="'drawer-field-' + column.name" [formControlName]="column.name"
+            [required]="column.required === true">
             {{ column.label }}
-            @if (column.required) {
-            <span class="text-red-600">*</span>
-            }
-          </label>
-
-          <div class="mt-1">
-            @if (column.type === "boolean") {
-            <input [id]="'drawer-field-' + column.name" [type]="inputType(column)" [formControlName]="column.name"
-              class="size-4 rounded border-slate-300 text-blue-600 focus:ring-blue-600" />
-            } @else {
-            <input [id]="'drawer-field-' + column.name" [type]="inputType(column)" [formControlName]="column.name"
-              [readOnly]="column.readonly === true"
-              class="block w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 read-only:bg-slate-100 disabled:bg-slate-100 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20" />
-            }
-          </div>
-
+          </mat-checkbox>
           @if (drawerForm().controls[column.name].touched && drawerForm().controls[column.name].invalid) {
-          <div class="mt-2 text-sm text-red-600">
-            <p>{{ fieldError(column) }}</p>
+          <p class="mt-2 text-sm text-red-600">{{ fieldError(column) }}</p>
+          }
+          } @else {
+          <div class="flex items-start gap-2">
+            @if (showsOperator(column)) {
+            <mat-form-field appearance="outline" class="w-32 shrink-0">
+              <mat-label>Op</mat-label>
+              <mat-select [formControlName]="operatorControlName(column)" required>
+                @for (operator of allowedOperators(column); track operator) {
+                <mat-option [value]="operator">{{ operatorLabel(operator) }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+            }
+
+            @if (hasAvailableValues(column)) {
+            <mat-form-field appearance="outline" class="min-w-0 flex-1">
+              <mat-label>{{ column.label }}</mat-label>
+              <mat-select [id]="'drawer-field-' + column.name" [formControlName]="column.name"
+                [multiple]="column.multiple === true" [required]="column.required === true">
+                @for (option of column.availableValues; track option.value) {
+                <mat-option [value]="option.value">{{ option.text }}</mat-option>
+                }
+              </mat-select>
+              @if (drawerForm().controls[column.name].touched && drawerForm().controls[column.name].invalid) {
+              <mat-error>{{ fieldError(column) }}</mat-error>
+              }
+            </mat-form-field>
+            } @else {
+            <mat-form-field appearance="outline" class="min-w-0 flex-1">
+              <mat-label>{{ column.label }}</mat-label>
+              <input matInput [id]="'drawer-field-' + column.name" [type]="inputType(column)"
+                [formControlName]="column.name" [readOnly]="column.readonly === true"
+                [required]="column.required === true" />
+              @if (drawerForm().controls[column.name].touched && drawerForm().controls[column.name].invalid) {
+              <mat-error>{{ fieldError(column) }}</mat-error>
+              }
+            </mat-form-field>
+            }
           </div>
           }
         </div>
         }
       </div>
 
-      <footer class="flex shrink-0 justify-end gap-2 border-t border-slate-200 bg-white p-4">
-        <button type="button"
-          class="inline-flex items-center gap-2 rounded border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2"
-          (click)="close()">
-          <fa-icon [icon]="'xmark'" [fixedWidth]="true"></fa-icon>
-          Cancel
-        </button>
-
-        <button type="submit"
-          class="inline-flex items-center gap-2 rounded bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2">
-          <fa-icon [icon]="'check'" [fixedWidth]="true"></fa-icon>
-          Apply
-        </button>
-      </footer>
     </form>
   </aside>
 </div>

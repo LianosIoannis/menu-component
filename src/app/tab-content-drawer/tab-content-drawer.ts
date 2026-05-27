@@ -1,17 +1,31 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, output, signal } from "@angular/core";
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
+import { MatCheckboxModule } from "@angular/material/checkbox";
+import { MatFormFieldModule } from "@angular/material/form-field";
+import { MatInputModule } from "@angular/material/input";
+import { MatSelectModule } from "@angular/material/select";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { FaIconRegistry } from "../services/fa-icon-registry";
 import type {
+	CriteriaOperator,
 	TabContentDrawerColumn,
 	TabContentDrawerFormModel,
 	TabContentDrawerOrientation,
 	TabContentDrawerValue,
 } from "./tab-content-drawer.model";
 
+type TabContentDrawerControlValue = CriteriaOperator | TabContentDrawerValue;
+
 @Component({
 	selector: "app-tab-content-drawer",
-	imports: [ReactiveFormsModule, FontAwesomeModule],
+	imports: [
+		ReactiveFormsModule,
+		MatCheckboxModule,
+		MatFormFieldModule,
+		MatInputModule,
+		MatSelectModule,
+		FontAwesomeModule,
+	],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: "./tab-content-drawer.html",
 })
@@ -67,6 +81,30 @@ export class TabContentDrawer {
 		return "";
 	}
 
+	protected hasAvailableValues(column: TabContentDrawerColumn): boolean {
+		return (column.availableValues?.length ?? 0) > 0;
+	}
+
+	protected allowedOperators(column: TabContentDrawerColumn): readonly CriteriaOperator[] {
+		return column.allowedOperators ?? [];
+	}
+
+	protected hasAllowedOperators(column: TabContentDrawerColumn): boolean {
+		return this.allowedOperators(column).length > 0;
+	}
+
+	protected showsOperator(column: TabContentDrawerColumn): boolean {
+		return column.type !== "boolean" && this.hasAllowedOperators(column);
+	}
+
+	protected operatorControlName(column: TabContentDrawerColumn): string {
+		return `${column.name}Operator`;
+	}
+
+	protected operatorLabel(operator: CriteriaOperator): string {
+		return operator.replace(/[A-Z]/g, (letter) => ` ${letter.toLowerCase()}`);
+	}
+
 	protected close(): void {
 		this.closed.emit();
 	}
@@ -78,26 +116,36 @@ export class TabContentDrawer {
 			return;
 		}
 
-		this.submitted.emit(this.drawerForm().getRawValue());
+		this.submitted.emit(this.createFormModel());
 	}
 
-	private createFormGroup(columns: readonly TabContentDrawerColumn[]): FormGroup<
-		Record<string, FormControl<TabContentDrawerValue>>
-	> {
+	private createFormGroup(
+		columns: readonly TabContentDrawerColumn[],
+	): FormGroup<Record<string, FormControl<TabContentDrawerControlValue>>> {
 		const controls = Object.fromEntries(
-			columns.map((column) => {
+			columns.flatMap((column) => {
 				const value = column.defaultValue ?? this.defaultValue(column);
+				const fieldControl = new FormControl(
+					{ value, disabled: column.readonly === true },
+					{
+						nonNullable: false,
+						validators: column.required ? [Validators.required] : [],
+					},
+				);
+				const controlEntries: [string, FormControl<TabContentDrawerControlValue>][] = [[column.name, fieldControl]];
+				const [operator] = this.allowedOperators(column);
 
-				return [
-					column.name,
-					new FormControl(
-						{ value, disabled: column.readonly === true },
-						{
-							nonNullable: false,
-							validators: column.required ? [Validators.required] : [],
-						},
-					),
-				];
+				if (this.showsOperator(column) && operator) {
+					controlEntries.unshift([
+						this.operatorControlName(column),
+						new FormControl(
+							{ value: operator, disabled: this.allowedOperators(column).length === 1 || column.readonly === true },
+							{ nonNullable: true, validators: [Validators.required] },
+						),
+					]);
+				}
+
+				return controlEntries;
 			}),
 		);
 
@@ -105,6 +153,27 @@ export class TabContentDrawer {
 	}
 
 	private defaultValue(column: TabContentDrawerColumn): TabContentDrawerValue {
+		if (column.multiple) {
+			return [];
+		}
+
 		return column.type === "boolean" ? false : null;
+	}
+
+	private createFormModel(): TabContentDrawerFormModel {
+		const formValue = this.drawerForm().getRawValue();
+
+		return Object.fromEntries(
+			this.columns().map((column) => {
+				const value = formValue[column.name];
+				const operator = formValue[this.operatorControlName(column)];
+
+				if (this.showsOperator(column) && typeof operator === "string") {
+					return [column.name, { operator, value }];
+				}
+
+				return [column.name, value];
+			}),
+		);
 	}
 }

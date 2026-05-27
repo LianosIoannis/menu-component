@@ -1,9 +1,12 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, output, signal } from "@angular/core";
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { MatCheckboxModule } from "@angular/material/checkbox";
+import { MatNativeDateModule } from "@angular/material/core";
+import { MatDatepickerModule } from "@angular/material/datepicker";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatInputModule } from "@angular/material/input";
 import { MatSelectModule } from "@angular/material/select";
+import { MatTooltipModule } from "@angular/material/tooltip";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { FaIconRegistry } from "../services/fa-icon-registry";
 import type {
@@ -14,16 +17,19 @@ import type {
 	TabContentDrawerValue,
 } from "./tab-content-drawer.model";
 
-type TabContentDrawerControlValue = CriteriaOperator | TabContentDrawerValue;
+type TabContentDrawerControlValue = CriteriaOperator | Date | TabContentDrawerValue;
 
 @Component({
 	selector: "app-tab-content-drawer",
 	imports: [
 		ReactiveFormsModule,
 		MatCheckboxModule,
+		MatDatepickerModule,
 		MatFormFieldModule,
 		MatInputModule,
+		MatNativeDateModule,
 		MatSelectModule,
+		MatTooltipModule,
 		FontAwesomeModule,
 	],
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -105,6 +111,12 @@ export class TabContentDrawer {
 		return operator.replace(/[A-Z]/g, (letter) => ` ${letter.toLowerCase()}`);
 	}
 
+	protected operatorTooltip(column: TabContentDrawerColumn): string {
+		const operator = this.drawerForm().controls[this.operatorControlName(column)]?.value;
+
+		return typeof operator === "string" ? this.operatorLabel(operator as CriteriaOperator) : "";
+	}
+
 	protected close(): void {
 		this.closed.emit();
 	}
@@ -124,7 +136,7 @@ export class TabContentDrawer {
 	): FormGroup<Record<string, FormControl<TabContentDrawerControlValue>>> {
 		const controls = Object.fromEntries(
 			columns.flatMap((column) => {
-				const value = column.defaultValue ?? this.defaultValue(column);
+				const value = this.controlValue(column);
 				const fieldControl = new FormControl(
 					{ value, disabled: column.readonly === true },
 					{
@@ -160,12 +172,22 @@ export class TabContentDrawer {
 		return column.type === "boolean" ? false : null;
 	}
 
+	private controlValue(column: TabContentDrawerColumn): TabContentDrawerControlValue {
+		const value = column.defaultValue ?? this.defaultValue(column);
+
+		if (column.type === "date" && typeof value === "string") {
+			return new Date(`${value}T00:00:00`);
+		}
+
+		return value;
+	}
+
 	private createFormModel(): TabContentDrawerFormModel {
 		const formValue = this.drawerForm().getRawValue();
 
 		return Object.fromEntries(
 			this.columns().map((column) => {
-				const value = formValue[column.name];
+				const value = this.submittedValue(column, formValue[column.name]);
 				const operator = formValue[this.operatorControlName(column)];
 
 				if (this.showsOperator(column) && typeof operator === "string") {
@@ -175,5 +197,16 @@ export class TabContentDrawer {
 				return [column.name, value];
 			}),
 		);
+	}
+
+	private submittedValue(
+		column: TabContentDrawerColumn,
+		value: TabContentDrawerControlValue | undefined,
+	): TabContentDrawerValue {
+		if (column.type === "date" && value instanceof Date) {
+			return value.toISOString().slice(0, 10);
+		}
+
+		return value === undefined ? null : (value as TabContentDrawerValue);
 	}
 }

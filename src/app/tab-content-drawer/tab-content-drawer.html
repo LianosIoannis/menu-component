@@ -44,7 +44,7 @@
           } @else {
           <div class="flex items-start gap-2">
             @if (showsOperator(column)) {
-            <mat-form-field appearance="outline" class="w-32 shrink-0">
+            <mat-form-field appearance="outline" class="w-32 shrink-0" [matTooltip]="operatorTooltip(column)">
               <mat-label>Op</mat-label>
               <mat-select [formControlName]="operatorControlName(column)" required>
                 @for (operator of allowedOperators(column); track operator) {
@@ -63,6 +63,18 @@
                 <mat-option [value]="option.value">{{ option.text }}</mat-option>
                 }
               </mat-select>
+              @if (drawerForm().controls[column.name].touched && drawerForm().controls[column.name].invalid) {
+              <mat-error>{{ fieldError(column) }}</mat-error>
+              }
+            </mat-form-field>
+            } @else if (column.type === "date") {
+            <mat-form-field appearance="outline" class="min-w-0 flex-1">
+              <mat-label>{{ column.label }}</mat-label>
+              <input matInput [id]="'drawer-field-' + column.name" [matDatepicker]="datePicker"
+                [formControlName]="column.name" [readOnly]="column.readonly === true"
+                [required]="column.required === true" />
+              <mat-datepicker-toggle matIconSuffix [for]="datePicker"></mat-datepicker-toggle>
+              <mat-datepicker #datePicker></mat-datepicker>
               @if (drawerForm().controls[column.name].touched && drawerForm().controls[column.name].invalid) {
               <mat-error>{{ fieldError(column) }}</mat-error>
               }

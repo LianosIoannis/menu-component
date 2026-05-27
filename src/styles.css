@@ -28,6 +28,9 @@ app-tab-container .mat-mdc-tab-body-content {
 	min-height: 0;
 }
 
+fa-icon {
+	display: inline-flex;
+}
 fa-icon .svg-inline--fa {
 	/* biome-ignore lint/complexity/noImportantStyles: <fa-icon> */
 	vertical-align: middle !important;

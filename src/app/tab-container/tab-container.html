@@ -5,21 +5,26 @@
     @for (tab of tabs(); track tab.id) {
     <mat-tab>
         <ng-template mat-tab-label>
-            @if (tab.menuItem.icon) {
-            <fa-icon class="text-base" [class]="tab.menuItem.iconColor || 'text-yellow-500'" [icon]="tab.menuItem.icon">
-            </fa-icon>
-            }
+            <div class="flex items-center justify-center" (auxclick)="closeTab($event, tab.id)">
 
-            <span class="ml-2 max-w-48 truncate select-none">
-                {{ tab.menuItem.text }}
-            </span>
+                @if (tab.menuItem.icon) {
+                <fa-icon class="text-base" [class]="tab.menuItem.iconColor || 'text-yellow-500'"
+                    [icon]="tab.menuItem.icon">
+                </fa-icon>
+                }
 
-            @if (tab.closable !== false) {
-            <button type="button" mat-icon-button class="ml-1 scale-75" aria-label="Close tab"
-                (click)="closeTab($event, tab.id)">
-                <mat-icon>close</mat-icon>
-            </button>
-            }
+                <span class="ml-2 max-w-48 truncate select-none">
+                    {{ tab.menuItem.text }}
+                </span>
+
+                @if (tab.closable !== false) {
+                <button type="button" class="ml-1 scale-75" aria-label="Close tab" (click)="closeTab($event, tab.id)">
+                    <fa-icon class="text-base" [class]="'text-red-400 hover:text-red-600'" [icon]="'xmark'">
+                    </fa-icon>
+                </button>
+                }
+
+            </div>
         </ng-template>
 
         <div class="h-full min-h-0 overflow-auto">

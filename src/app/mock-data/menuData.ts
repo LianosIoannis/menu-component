@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/suspicious/noTemplateCurlyInString: <test> */
 import type { MenuDataModelRaw } from "../menu/menuItemRaw.model";
 
 export const menuData: MenuDataModelRaw = {

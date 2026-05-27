@@ -1,5 +1,5 @@
-/** biome-ignore-all lint/suspicious/noExplicitAny: <explanation> */
-/** biome-ignore-all lint/complexity/noBannedTypes: <explanation> */
+/** biome-ignore-all lint/suspicious/noExplicitAny: <test> */
+/** biome-ignore-all lint/complexity/noBannedTypes: <test> */
 import type {
 	Handler,
 	MaybePromise,

@@ -2,25 +2,25 @@
   <header class="shrink-0 border-b border-slate-200">
     <div class="h-12 flex items-center justify-end gap-3 p-3">
 
-      <button type="button"
+      <button type="button" (click)="insertClicked()" [disabled]="!menuItemTableService.canInsert() || loading()"
         class="inline-flex size-9 items-center justify-center rounded border border-emerald-200 bg-emerald-50 text-emerald-700 transition hover:bg-emerald-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2"
         aria-label="Add new row" title="New row">
         <fa-icon [icon]="'plus'" [fixedWidth]="true"></fa-icon>
       </button>
 
-      <button type="button"
+      <button type="button" (click)="deleteClicked()" [disabled]="!menuItemTableService.canDelete() || loading()"
         class="inline-flex size-9 items-center justify-center rounded border border-red-200 bg-red-50 text-red-700 transition hover:bg-red-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-600 focus-visible:ring-offset-2"
         aria-label="Remove selected row" title="Remove">
         <fa-icon [icon]="'trash'" [fixedWidth]="true"></fa-icon>
       </button>
 
-      <button type="button"
+      <button type="button" (click)="updateClicked()" [disabled]="!menuItemTableService.canUpdate() || loading()"
         class="inline-flex size-9 items-center justify-center rounded border border-amber-200 bg-amber-50 text-amber-700 transition hover:bg-amber-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-600 focus-visible:ring-offset-2"
         aria-label="Edit selected row" title="Edit">
         <fa-icon [icon]="'edit'" [fixedWidth]="true"></fa-icon>
       </button>
 
-      <button type="button" (click)="editClicked()"
+      <button type="button" (click)="filterClicked()"
         class="inline-flex size-9 items-center justify-center rounded border border-sky-200 bg-sky-50 text-sky-700 transition hover:bg-sky-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-600 focus-visible:ring-offset-2"
         aria-label="Filter rows" title="Filter">
         <fa-icon [icon]="'filter'" [fixedWidth]="true"></fa-icon>
@@ -45,4 +45,4 @@
 </section>
 
 <app-tab-content-drawer [open]="drawerOpen()" [title]="drawerTitle()" (closed)="closeDrawer()"
-  (submitted)="criteriaSubmitted($event)" [columns]="criteriaColumns()"></app-tab-content-drawer>
+  (submitted)="drawerSubmitted($event)" [columns]="drawerColumns()"></app-tab-content-drawer>

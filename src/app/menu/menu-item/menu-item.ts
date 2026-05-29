@@ -1,7 +1,7 @@
 import { Component, computed, effect, inject, input, output, signal } from "@angular/core";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { FaIconRegistry } from "../../services/fa-icon-registry";
-import type { MenuItemModel } from "../menuItem.model";
+import type { MenuItemModel } from "../models/menu-item-models/index";
 
 @Component({
 	selector: "app-menu-item",

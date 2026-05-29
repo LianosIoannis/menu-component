@@ -2,7 +2,7 @@ import { Component, computed, input, output, signal } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { MenuItem } from "./menu-item/menu-item";
-import type { MenuDataModel, MenuItemModel } from "./menuItem.model";
+import type { MenuDataModel, MenuItemModel } from "./models/menu-item-models/index";
 
 @Component({
 	selector: "app-menu",

@@ -1,6 +1,6 @@
-import type { ColDef, ValueFormatterParams } from "ag-grid-community";
+import type { ColDef } from "ag-grid-community";
 import dayjs from "dayjs";
-import type { TableColumnParams, TableColumnType } from "../menu/menuItem.model";
+import type { Scalar, TableColumnParams, TableColumnType } from "../models/menu-item-models/index";
 
 export function createColumnDefs<T extends object>(columns: readonly TableColumnParams[]): ColDef<T>[] {
 	return columns
@@ -40,26 +40,46 @@ function createCellDataType(type: TableColumnType): ColDef["cellDataType"] {
 function createValueFormatter<T extends object>(column: TableColumnParams): ColDef<T>["valueFormatter"] {
 	switch (column.type) {
 		case "date":
-			return (params) => formatDateValue(params, "DD/MM/YYYY");
+			return (params) => formatTableDateValue(params.value as Scalar, "DD/MM/YYYY");
 
 		case "datetime":
-			return (params) => formatDateValue(params, "DD/MM/YYYY HH:mm");
+			return (params) => formatTableDateValue(params.value as Scalar, "DD/MM/YYYY HH:mm");
 
 		case "time":
-			return (params) => formatDateValue(params, "HH:mm");
+			return (params) => formatTableDateValue(params.value as Scalar, "HH:mm");
 
 		default:
 			return undefined;
 	}
 }
 
-function formatDateValue<TData, TValue>(params: ValueFormatterParams<TData, TValue>, format: string): string {
-	if (params.value === null || params.value === undefined || params.value === "") {
+export function formatTableFieldValue(value: Scalar, type: TableColumnType): Scalar {
+	switch (type) {
+		case "date":
+			return formatTableDateValue(value, "YYYY-MM-DD");
+
+		case "datetime":
+			return formatTableDateValue(value, "YYYY-MM-DD HH:mm");
+
+		case "time":
+			return formatTableDateValue(value, "HH:mm");
+
+		default:
+			return value;
+	}
+}
+
+function formatTableDateValue(value: Scalar, format: string): string {
+	if (value === null || value === "") {
 		return "";
 	}
 
-	const value = dayjs(params.value as string);
+	if (typeof value === "boolean") {
+		return String(value);
+	}
 
-	return value.isValid() ? value.format(format) : String(params.value);
+	const date = dayjs(value);
+
+	return date.isValid() ? date.format(format) : String(value);
 }
 

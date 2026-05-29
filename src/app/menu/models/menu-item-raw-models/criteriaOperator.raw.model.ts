@@ -1,0 +1,15 @@
+export type CriteriaOperator =
+	| "equals"
+	| "notEquals"
+	| "greaterThan"
+	| "lessThan"
+	| "greaterThanOrEqual"
+	| "lessThanOrEqual"
+	| "contains"
+	| "notContains"
+	| "startsWith"
+	| "endsWith"
+	| "between"
+	| "notBetween"
+	| "in"
+	| "notIn";

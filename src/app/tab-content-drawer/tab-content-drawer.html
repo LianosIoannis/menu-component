@@ -80,6 +80,33 @@
               <mat-error>{{ fieldError(column) }}</mat-error>
               }
             </mat-form-field>
+            } @else if (column.type === "datetime") {
+            <div class="value-field grid min-w-0 flex-1 grid-cols-2 gap-2">
+              <mat-form-field appearance="outline" subscriptSizing="dynamic" class="min-w-0">
+                <mat-label>{{ column.label }}</mat-label>
+                <input matInput [id]="'drawer-field-' + column.name" [matDatepicker]="dateTimeDatePicker"
+                  [formControlName]="column.name" [readOnly]="column.readonly === true"
+                  [required]="column.required === true" />
+                <mat-datepicker-toggle matIconSuffix [for]="dateTimeDatePicker"></mat-datepicker-toggle>
+                <mat-datepicker #dateTimeDatePicker></mat-datepicker>
+                @if (drawerForm().controls[column.name].touched && drawerForm().controls[column.name].invalid) {
+                <mat-error>{{ fieldError(column) }}</mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" subscriptSizing="dynamic" class="min-w-0">
+                <mat-label>Time</mat-label>
+                <input matInput [id]="'drawer-field-' + column.name + '-time'" [matTimepicker]="dateTimeTimePicker"
+                  [formControlName]="timeControlName(column)" [readOnly]="column.readonly === true"
+                  [required]="column.required === true" />
+                <mat-timepicker-toggle matIconSuffix [for]="dateTimeTimePicker"></mat-timepicker-toggle>
+                <mat-timepicker #dateTimeTimePicker></mat-timepicker>
+                @if (drawerForm().controls[timeControlName(column)].touched &&
+                drawerForm().controls[timeControlName(column)].invalid) {
+                <mat-error>{{ fieldError(column) }}</mat-error>
+                }
+              </mat-form-field>
+            </div>
             } @else {
             <mat-form-field appearance="outline" subscriptSizing="dynamic" class="value-field min-w-0 flex-1">
               <mat-label>{{ column.label }}</mat-label>

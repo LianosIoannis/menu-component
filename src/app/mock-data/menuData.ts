@@ -1,5 +1,5 @@
 /** biome-ignore-all lint/suspicious/noTemplateCurlyInString: <test> */
-import type { MenuDataModelRaw } from "../menu/menuItemRaw.model";
+import type { MenuDataModelRaw } from "../menu/models/menu-item-raw-models/index";
 
 export const menuData: MenuDataModelRaw = {
 	mainHeaderText: "Administration",
@@ -14,7 +14,7 @@ export const menuData: MenuDataModelRaw = {
 			items: [],
 			params: {
 				screenType: "table",
-				table: {
+				tableParams: {
 					name: "timer_fpr2",
 					columns: [
 						{
@@ -32,6 +32,10 @@ export const menuData: MenuDataModelRaw = {
 									allowedFilters: ["equals", "greaterThan", "lessThan"],
 								},
 							},
+							insert: {
+								enabled: true,
+								required: true,
+							},
 						},
 						{
 							name: "epon",
@@ -45,6 +49,7 @@ export const menuData: MenuDataModelRaw = {
 								criteria: {
 									enabled: true,
 									allowedFilters: ["contains", "equals", "startsWith"],
+									required: true,
 								},
 							},
 							insert: {

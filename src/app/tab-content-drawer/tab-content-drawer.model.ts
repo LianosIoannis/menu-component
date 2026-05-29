@@ -1,4 +1,4 @@
-import type { CriteriaOperator, TableColumnType } from "../menu/menuItem.model";
+import type { CriteriaOperator, TableColumnType } from "../menu/models/menu-item-models/index";
 
 export type { CriteriaOperator };
 
@@ -25,6 +25,7 @@ export type TabContentDrawerColumn = {
 	label: string;
 	type: TableColumnType;
 	allowedOperators?: CriteriaOperator[];
+	defaultOperator?: CriteriaOperator;
 	availableValues?: TabContentDrawerAvailableValue[];
 	multiple?: boolean;
 	required?: boolean;

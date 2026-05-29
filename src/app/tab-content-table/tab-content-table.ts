@@ -7,7 +7,6 @@ import {
 	input,
 	output,
 	type Signal,
-	signal,
 	untracked,
 } from "@angular/core";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
@@ -23,60 +22,64 @@ import {
 	type RowSelectionOptions,
 	themeAlpine,
 } from "ag-grid-community";
-import type { Criteria, MenuItemModel, Row, SelectInput, SelectOutput } from "../menu/menuItem.model";
+import type { MenuItemModel, Row } from "../menu/models/menu-item-models/index";
+import { MenuItemTableService } from "../menu/services/menuItemTable.service";
 import { AgGridRegistry } from "../services/ag-grid-registry";
-import { Data } from "../services/data";
 import { FaIconRegistry } from "../services/fa-icon-registry";
 import { TabContentDrawer } from "../tab-content-drawer/tab-content-drawer";
 import type { TabContentDrawerColumn, TabContentDrawerFormModel } from "../tab-content-drawer/tab-content-drawer.model";
-import { createDrawerScenarios } from "./drawer.utils";
-import { runHandler } from "./query.utils";
-import { createColumnDefs } from "./table.utils";
 
 @Component({
 	selector: "app-tab-content-table",
 	imports: [AgGridAngular, FontAwesomeModule, TabContentDrawer],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: "./tab-content-table.html",
+	providers: [MenuItemTableService],
 })
 export class TabContentTable<T extends object> {
 	private gridApi: GridApi<T> | undefined;
 	private columnsAutoSized = false;
-
-	drawerData = signal<Record<string, unknown>>({});
+	private initialRetrieveStarted = false;
 
 	agGridRegistry = inject(AgGridRegistry);
-	data = inject(Data);
 	faIconRegistry = inject(FaIconRegistry);
+	menuItemTableService = inject(MenuItemTableService);
 	themeAlpine = themeAlpine.withPart(colorSchemeLightCold);
-
-	drawerOpen = signal(false);
-	loading = signal(false);
-	rowData = signal<T[]>([]);
-	criteria = signal<Criteria>({});
 
 	active = input(false);
 	menuItem = input.required<MenuItemModel>();
 	rowClicked = output<T>();
 
-	criteriaColumns = signal<TabContentDrawerColumn[]>([]);
-	drawerTitle = signal("");
+	loading = this.menuItemTableService.loading;
+	drawerOpen = this.menuItemTableService.drawerOpen;
+	drawerTitle = this.menuItemTableService.drawerTitle;
+	drawerColumns = this.menuItemTableService.drawerColumns as Signal<TabContentDrawerColumn[]>;
+	rowData = computed(() => this.menuItemTableService.rows() as unknown as T[]);
+	columnDefs = this.menuItemTableService.columnDefs as Signal<ColDef<T>[]>;
 
-	columnDefs: Signal<ColDef<T>[]> = computed(() => {
-		const table = this.menuItem().params?.table;
+	menuItemEffect = effect(() => {
+		const menuItem = this.menuItem();
+		const menuItemChanged = untracked(() => this.menuItemTableService.setMenuItem(menuItem));
 
-		if (!table) {
-			return [];
+		if (menuItemChanged) {
+			this.initialRetrieveStarted = false;
 		}
-
-		return createColumnDefs<T>(table.columns);
 	});
 
 	activeTabEffect = effect(() => {
 		if (this.active()) {
 			untracked(() => {
 				this.autoSizeColumnsOnceAfterDataLoaded();
-				void this.loadRows();
+
+				if (this.initialRetrieveStarted) {
+					return;
+				}
+
+				this.initialRetrieveStarted = true;
+				void this.menuItemTableService.loadRows().then(() => {
+					this.columnsAutoSized = false;
+					this.autoSizeColumnsOnceAfterDataLoaded();
+				});
 			});
 		}
 	});
@@ -111,59 +114,43 @@ export class TabContentTable<T extends object> {
 			return;
 		}
 
+		this.menuItemTableService.setSelectedRow(event.data as unknown as Row);
 		this.rowClicked.emit(event.data);
 	}
 
-	protected editClicked(): void {
-		const scenario = createDrawerScenarios(this.menuItem()).criteria;
-
-		this.drawerTitle.set(scenario.title);
-		this.criteriaColumns.set(scenario.columns);
-		this.drawerOpen.set(true);
+	protected insertClicked(): void {
+		this.menuItemTableService.openInsertDrawer();
 	}
 
-	protected async criteriaSubmitted(criteria: TabContentDrawerFormModel): Promise<void> {
-		this.criteria.set(criteria);
-		this.closeDrawer();
-		await this.loadRows();
+	protected updateClicked(): void {
+		this.menuItemTableService.openUpdateDrawer();
+	}
+
+	protected async deleteClicked(): Promise<void> {
+		await this.menuItemTableService.deleteSelectedRow();
+		this.columnsAutoSized = false;
+		this.autoSizeColumnsOnceAfterDataLoaded();
+		await this.menuItemTableService.loadRows();
+	}
+
+	protected filterClicked(): void {
+		this.menuItemTableService.openCriteriaDrawer();
+	}
+
+	protected async drawerSubmitted(model: TabContentDrawerFormModel): Promise<void> {
+		await this.menuItemTableService.submitDrawer(model);
+		this.columnsAutoSized = false;
+		this.autoSizeColumnsOnceAfterDataLoaded();
 	}
 
 	protected closeDrawer(): void {
-		this.criteriaColumns.set([]);
-		this.drawerTitle.set("");
-		this.drawerOpen.set(false);
+		this.menuItemTableService.closeDrawer();
 	}
 
 	protected async refreshClicked(): Promise<void> {
-		await this.loadRows();
-	}
-
-	private async loadRows(): Promise<void> {
-		const select = this.menuItem().params?.table?.handlers?.select;
-
-		if (!select) {
-			this.rowData.set([]);
-			return;
-		}
-
-		this.loading.set(true);
-
-		try {
-			const rows = await runHandler<SelectInput, SelectOutput>(
-				select,
-				{ criteria: this.criteria() },
-				this.data.execQuery.bind(this.data),
-			);
-
-			this.rowData.set(rows as T[]);
-			this.columnsAutoSized = false;
-			this.autoSizeColumnsOnceAfterDataLoaded();
-		} catch (error: unknown) {
-			console.error(error);
-			this.rowData.set([]);
-		} finally {
-			this.loading.set(false);
-		}
+		await this.menuItemTableService.loadRows();
+		this.columnsAutoSized = false;
+		this.autoSizeColumnsOnceAfterDataLoaded();
 	}
 
 	private autoSizeColumnsOnceAfterDataLoaded(): void {

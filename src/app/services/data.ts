@@ -28,7 +28,8 @@ export class Data {
 				body: query,
 			});
 
-			const data = await res.json();
+			const responseText = await res.text();
+			const data = this.parseResponse(responseText);
 
 			if (res.status === 532) {
 				alert("Session expired. Please log in again.");
@@ -37,10 +38,14 @@ export class Data {
 			}
 
 			if (!res.ok) {
-				return { success: false, error: data?.message || "Query execution failed" };
+				return { success: false, error: this.responseMessage(data) ?? (responseText || "Query execution failed") };
 			}
 
-			const data0 = data?.data?.data0;
+			if (data === null) {
+				return { success: true, data: true };
+			}
+
+			const data0 = this.responseData(data);
 
 			return { success: true, data: data0 };
 		} finally {
@@ -48,5 +53,37 @@ export class Data {
 				this.loading.set(false);
 			}
 		}
+	}
+
+	private parseResponse(responseText: string): unknown | null {
+		if (!responseText.trim()) {
+			return null;
+		}
+
+		try {
+			return JSON.parse(responseText) as unknown;
+		} catch {
+			return null;
+		}
+	}
+
+	private responseMessage(data: unknown): string | undefined {
+		if (!this.isRecord(data)) {
+			return undefined;
+		}
+
+		return typeof data["message"] === "string" ? data["message"] : undefined;
+	}
+
+	private responseData(data: unknown): unknown {
+		if (!this.isRecord(data) || !this.isRecord(data["data"])) {
+			return true;
+		}
+
+		return data["data"]["data0"] ?? true;
+	}
+
+	private isRecord(value: unknown): value is Record<string, unknown> {
+		return typeof value === "object" && value !== null && !Array.isArray(value);
 	}
 }
